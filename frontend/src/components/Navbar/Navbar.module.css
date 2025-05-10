@@ -1,0 +1,136 @@
+/* remove any default overflows */
+:global(html),
+:global(body) {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* NAVBAR CONTAINER */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  background-color: #181a1b;
+  padding: 0 2rem;
+  height: 90px;
+  border-bottom: 1px solid #2c2c2c;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+/* LOGO */
+.logo {
+  font-size: 2.8rem;
+  color: #00e676;
+  font-weight: bold;
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 10px rgba(0, 230, 118, 0.3);
+  margin-right: 2rem; /* push nav-links over */
+}
+
+/* NAV LINKS */
+.navLinks {
+  display: flex;
+  list-style: none;
+  gap: 2rem; /* space between links */
+}
+
+.navLinks li a {
+  text-decoration: none;
+  color: #6d6d75;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.navLinks li a:hover {
+  color: #00e676;
+}
+
+/* ACTIVE UNDERLINE */
+.active {
+  color: #ffffff;
+  font-weight: 600;
+  position: relative;
+}
+
+.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #00e676;
+}
+
+/* RIGHT-ALIGNED BUTTONS */
+.navButtons {
+  margin-left: auto; /* magic! pushes this group to the far right */
+  display: flex;
+  gap: 1rem;
+}
+
+/* AUTH BUTTON STYLES (copy‑pasted from Auth.module.css) */
+.authButton {
+  padding: 0.9rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Primary */
+.signupBtn {
+  background-color: #00e676;
+  color: #0d1117;
+}
+
+.signupBtn:hover {
+  background-color: #00c764;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 230, 118, 0.2);
+}
+
+/* Outline */
+.loginBtn {
+  background-color: transparent;
+  border: 1px solid #00e676;
+  color: #00e676;
+}
+
+.loginBtn:hover {
+  background-color: rgba(0, 230, 118, 0.1);
+}
+
+/* MOBILE (optional) */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+  .logo {
+    margin-bottom: 1rem;
+  }
+  .navLinks {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  .navButtons {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+}
