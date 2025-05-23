@@ -4,10 +4,11 @@ import styles from '../MainPage/MainPage.module.css';
 import { FaGoogle, FaFacebookF } from 'react-icons/fa';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
-import { signup } from '../../services/authService';
+import { signup, login } from '../../services/authService';
+//Validating Data from Login and Signup
 import { validateSignupForm, SignupFormValues } from '../../utils/Validations/SignupValidation';
-import { useAuth } from '../../context/AuthContext';
-
+import { validateLoginForm } from '../../utils/Validations/LoginValidation';
+import { useAuth } from '../../contexts/AuthContext';
 const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = true }) => {
   const [isLogin, setIsLogin] = useState(defaultIsLogin);
   const [formData, setFormData] = useState({
@@ -27,7 +28,22 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const {isValid, errors} = validateSignupForm(formData);
+    
+    let isValid: boolean;
+    let errors: any;
+
+    if (!isLogin) {
+      //Use signup Validations
+      const result = await validateSignupForm(formData);
+      isValid = result.isValid;
+      errors = result.errors;
+    } else {
+      //User Login validation
+      const result = await validateLoginForm(formData);
+      isValid = result.isValid;
+      errors = result.errors;
+    }
+
     if (!isValid) {
       setFormErrors(errors);
       return;
@@ -47,7 +63,17 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
         alert(error.response?.data?.message || 'Signup failed');
       }
     } else {
-      console.log('Logging in with:', formData);
+      try {
+        //Login API call so that request is sent to backend to the route '/api/auth/login' and the route will be handled by the controller
+        await login({
+          username: formData. username,
+          password: formData. password
+        });
+        setAuthenticated(true, formData.username)
+        alert('Login successful'); 
+      } catch (error: any) {
+        alert(error.response?.data?.message || 'Login failed');
+      }
     }
   };
 

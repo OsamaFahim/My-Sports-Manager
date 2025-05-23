@@ -1,8 +1,7 @@
-// utils/validation/signupValidation.ts
-import { checkEmailExists } from "../../services/authService";
+// utils/validation/LoginValidation.ts
 
 export interface LoginFormValues {
-    email: string;
+    username: string;
     password: string;
 }
 
@@ -11,26 +10,18 @@ export interface ValidationResult {
     errors: Partial<Record<keyof LoginFormValues, string>>; // Partial allows for some keys to be missing
 }
 
-// Async function to validate if the email exists in the database
-export async function validateEmailExsistance(email: string): Promise<string | null> {
-    email = email.trim();
-    if (!email) {
-        return "Email is required.";
+// Async function to validate if the username exists in the database
+export async function validateUsernameExsistance(username: string): Promise<string | null> {
+    username = username.trim();
+    if (!username) {
+        return "Username is required.";
     }
 
-   try {
-        const exists = await checkEmailExists(email);
-        if (!exists) {
-            return "Email does not exsist.";
-        }
-        return null;
-   } catch {
-        return "Error checking email existence.";
-   }
+    return null;
 }
 
 //Async function to validate the username field in the signup form
-export function validatePasswordExsistance(password: string, email: string): string | null {
+export async function validatePasswordExsistance(password: string): Promise<string | null> {
     password = password.trim();
     if (!password) {
         return "Paswword is required.";
@@ -45,14 +36,14 @@ export const validateLoginForm = async (form: LoginFormValues): Promise<Validati
     let isValid: boolean = true;
 
     //Email validation
-    const emailError = await validateEmailExsistance(form.email);
-    if (emailError) {
-        errors.email = emailError;
+    const usernameError = await validateUsernameExsistance(form.username);
+    if (usernameError) {
+        errors.username = usernameError;
         isValid = false;
     }
 
     //Password validation
-    const passwordError = validatePasswordExsistance(form.password, form.email);
+    const passwordError = await validatePasswordExsistance(form.password);
     if (passwordError) {
         errors.password = passwordError;
         isValid = false;

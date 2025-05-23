@@ -20,12 +20,12 @@ async function initMongo() {
       console.log(`Creating database: ${dbName}`);
       const db = client.db(dbName);
       await db.collection("initCollection").insertOne({ createdAt: new Date() });
-      console.log(`✅ Database "${dbName}" created.`);
+      //console.log(`✅ Database "${dbName}" created.`);
     } else {
-      console.log(`✅ Database "${dbName}" already exists.`);
+      //console.log(`✅ Database "${dbName}" already exists.`);
     }
   } catch (err) {
-    console.error("❌ Error:", err);
+    //console.error("❌ Error:", err);
   } finally {
     await client.close();
   }

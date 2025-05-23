@@ -1,55 +1,50 @@
-// components/Auth/LoginForm.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '../MainPage/MainPage.module.css';
+import AuthInput from './AuthInput';
+import AuthCheckbox from './AuthCheckbox';
 
 interface LoginFormProps {
-  formData: { email: string; password: string };
+  formData: { username: string; password: string };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ formData, onChange, onSubmit }) => (
-  <form className={styles.AuthForm} onSubmit={onSubmit}>
-    <div className={styles.formGroup}>
-      <label htmlFor="email">Email</label>
-      <input
-        type="email"
-        id="email"
-        className={styles.authInput}
-        placeholder="Enter your email"
-        value={formData.email}
-        onChange={onChange}
-        required
-      />
-    </div>
+const LoginForm: React.FC<LoginFormProps> = ({ formData, onChange, onSubmit }) => {
+  const [showPassword, setShowPassword] = useState(false);
 
-    <div className={styles.formGroup}>
-      <label htmlFor="password">Password</label>
-      <input
-        type="password"
+  return (
+    <form className={styles.authForm} onSubmit={onSubmit}>
+      <AuthInput
+        id="username"
+        label="Username"
+        value={formData.username}
+        onChange={onChange}
+        placeholder="Enter your username"
+      />
+      <AuthInput
         id="password"
-        className={styles.authInput}
-        placeholder="Enter your password"
+        label="Password"
+        type={showPassword ? 'text' : 'password'}
         value={formData.password}
         onChange={onChange}
-        required
+        placeholder="Enter your password"
       />
-    </div>
-
-    <div className={styles.formOptions}>
-      <div className={styles.rememberMe}>
-        <input type="checkbox" id="remember" className={styles.checkbox} />
-        <label htmlFor="remember">Remember me</label>
+      <div className={styles.formOptions}>
+        <AuthCheckbox
+          id="showPassword"
+          label="Show Password"
+          checked={showPassword}
+          onChange={() => setShowPassword((prev) => !prev)}
+        />
+        {/* <div className={styles.forgotPassword}>
+          <a href="#" className={styles.authLink}>Forgot password?</a>
+        </div> */}
       </div>
-      <div className={styles.forgotPassword}>
-        <a href="#" className={styles.authLink}>Forgot password?</a>
-      </div>
-    </div>
-
-    <button type="submit" className={styles.authButton}>
-      Login
-    </button>
-  </form>
-);
+      <button type="submit" className={styles.authButton}>
+        Login
+      </button>
+    </form>
+  );
+};
 
 export default LoginForm;
