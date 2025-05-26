@@ -1,7 +1,9 @@
 // File: backend/src/services/authService.ts
+import User from '../models/User';
 import bcrypt from 'bcryptjs';
-import { connectToMongo } from '../config/db';
 import jwt from 'jsonwebtoken';
+// Importing the utility function to create HTTP errors
+import { createHttpError } from '../utils/createHttpError';
 
 export interface SignupInput {
   username: string;
@@ -15,81 +17,60 @@ export interface LoginInput {
 }
 
 export async function signupService({ username, email, password }: SignupInput): Promise<{ message: string; token: string }> {
-  const db = await connectToMongo();
-  const users = db.collection('users');
-
-  //Check if user's username already exists
-  const exsistingUserUsername = await checkUsernameExsistsService(username);
+  // Check if user's username already exists
+  const exsistingUserUsername = await User.findOne({ username });
   if (exsistingUserUsername) {
-    throw new Error('Username already is use');
+    throw createHttpError('Username already in use', 409);
   }
 
   // Check if user's email already exists
-  const existingUserEmail = await checkEmailExistsService(email);
+  const existingUserEmail = await User.findOne({ email });
   if (existingUserEmail) {
-    throw new Error('Email already in use');
+    throw createHttpError('Email already in use', 409); // Fixed the incorrect message
   }
 
-  // Hash password
+  // Hash password before storing in DB
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Insert new user
-  await users.insertOne({ username, email, password: hashedPassword });
+  // Insert new user into the database
+  await User.create({ username, email, password: hashedPassword });
 
-  // Create JWT token (optional, but recommended for auth)
-  const token = jwt.sign({ email, username }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
+  // ✅ Create JWT token (recommended for authentication)
+  // Reason: After signing up, the user is usually logged in automatically.
+  // By issuing a token here, the user does not need to login again right after signup.
+  // The token can be stored on the client side (usually in localStorage or cookies)
+  // and will be used in Authorization headers to access protected routes.
+  //
+  // Example: Creating, editing, or deleting a team should only be allowed for logged-in users.
+  // The frontend sends this token on every request to those routes.
+  // The backend checks the token and allows access only if it's valid.
+  const token = jwt.sign({ username }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
 
   return { message: 'User created successfully', token };
 }
 
 export async function LoginService({ username, password }: LoginInput): Promise<{ message: string; token: string }> {
-
-  const validUsername = await checkUsernameExsistsService(username);
+  // Check if username exists
+  const validUsername = await User.findOne({ username });
   if (!validUsername) {
-    throw new Error('Username is not valid');
+    throw createHttpError('Username is not valid', 401);
   }
 
-  const validUser = await checkValidPasswordExsistsService(username, password);
+  // Compare provided password with stored hashed password
+  const validUser = await bcrypt.compare(password, validUsername.password);
   if (!validUser) {
-    throw new Error('Password is not valid')
+    throw createHttpError('Password is not valid', 401);
   }
 
-   // Create JWT token (optional, but recommended for auth)
-  const token = jwt.sign({username, password}, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
+  // ✅ Create JWT token after successful login
+  // Reason: This token is crucial for maintaining authenticated sessions in a stateless manner.
+  // Once logged in, the frontend stores this token and includes it in the Authorization header
+  // for all requests to protected backend routes.
+  //
+  // Example: In our app, only authenticated users can create, update, or delete their teams.
+  // Without a valid JWT token, the user will only be allowed to see public teams or none at all.
+  // The backend middleware (like authenticateJWT) uses this token to verify the user's identity.
+  const token = jwt.sign({ username }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
 
-  return {message: 'User created successfully', token};
-}
-
-//Service to check whether any user has same email
-export async function checkEmailExistsService(email: string): Promise<boolean> {
-  const db = await connectToMongo();
-  const users = db.collection('users');
-
-  // Check if email already exists
-  const existingEmail = await users.findOne({ email });
-  return !!existingEmail;  //does the same thing as return existingUser ? true : false;
-}
-
-////Service to check whether any user has same username
-export async function checkUsernameExsistsService(username: string): Promise<boolean> {
-  const db = await connectToMongo();
-  const users = db.collection('users');
-
-  //check if username already exsists
-  const existingUsername = await users.findOne({ username });
-  return !!existingUsername;
-}
-
-export async function checkValidPasswordExsistsService(username: string, password: string): Promise<boolean> {
-  //Fetch the user by username 
-  const db = await connectToMongo();
-  const users = db.collection('users');
-  const user = await users.findOne({ username });
-  if (!user || !user.password) {
-    return false;
-  }
-
-  //Compare the provided password with the hashed password in the db
-  const isMatch = await bcrypt.compare(password, user.password);
-  return isMatch;
+  return { message: 'User logged in successfully', token };
 }

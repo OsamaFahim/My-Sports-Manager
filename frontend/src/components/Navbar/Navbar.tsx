@@ -9,8 +9,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
   const { pathname } = useLocation();
-  const isLanding = pathname === '/';
-  const { isAuthenticated, username, logout } = useAuth(); // handle here
+  const { isAuthenticated, username, logout } = useAuth();
 
   return (
     <nav className={styles.navbar}>
@@ -40,50 +39,51 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
         </li>
         <li>
           <Link
-            to="/stats"
-            className={pathname === '/stats' ? styles.active : undefined}
+            to="/Grounds"
+            className={pathname === '/Grounds' ? styles.active : undefined}
           >
             Stats
           </Link>
         </li>
       </ul>
 
-      {isLanding && (
-        <div className={styles.navButtons}>
-          {!isAuthenticated ? (
-            <>
-              <button
-                className={`${styles.authButton} ${styles.signupBtn}`}
-                onClick={() => onAuthAction?.('signup')}
-                type="button"
-              >
-                Create Account
-              </button>
-              <button
-                className={`${styles.authButton} ${styles.loginBtn}`}
-                onClick={() => onAuthAction?.('login')}
-                type="button"
-              >
-                Login
-              </button>
-            </>
-          ) : (
-            <>
-              <span className={styles.logo}>
-                Welcome{username ? `, ${username}` : ''}!
-              </span>
-              <button
-                className={`${styles.authButton} ${styles.loginBtn}`}
-                onClick={logout}
-                type="button"
-                style={{ marginLeft: 12 }}
-              >
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-      )}
+      <div className={styles.navButtons}>
+        {!isAuthenticated ? (
+          <>
+            {pathname === '/' && (
+              <>
+                <button
+                  className={`${styles.authButton} ${styles.signupBtn}`}
+                  onClick={() => onAuthAction?.('signup')}
+                  type="button"
+                >
+                  Create Account
+                </button>
+                <button
+                  className={`${styles.authButton} ${styles.loginBtn}`}
+                  onClick={() => onAuthAction?.('login')}
+                  type="button"
+                >
+                  Login
+                </button>
+              </>
+            )}
+          </>
+        ) : (
+          <div className={styles.authSection}>
+            <span className={styles.welcome}>
+              Welcome{username ? `, ${username}` : ''}!
+            </span>
+            <button
+              className={`${styles.authButton} ${styles.loginBtn}`}
+              onClick={logout}
+              type="button"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

@@ -1,27 +1,18 @@
-import express, { Request, Response } from 'express';
-import { LoginService, signupService } from '../services/authService';
+import express from 'express';
+import * as authController from '../controllers/authController';
+import { errorHandler } from '../middlewares/ErrorHandlerMiddleware';
 
 const router = express.Router();
 
-//Signup request sent by axios to here
-router.post('/signup', async (req: Request, res: Response) => {
-  try {
-    const result = await signupService(req.body);
-    res.status(201).json(result);
-  } catch (err: any) {
-    res.status(400).json({ message: err.message });
-  }
-});
+// Helper to wrap async controllers and forward errors
+function wrap(fn: any) {
+  return (req: any, res: any, next: any) => fn(req, res).catch(next);
+}
 
-//Login request sent by axios to here
-router.post('/login', async (req: Request, res: Response) => {
-  try {
-    console.log(req.body);
-    const result = await LoginService(req.body);
-    res.status(201).json(result);
-  } catch (err: any) {
-    res.status(400).json({ message: err.message });
-  }
-});
+router.post('/signup', wrap(authController.signup));
+router.post('/login', wrap(authController.login));
+
+// Centralized error handler (for async errors)
+router.use(errorHandler);
 
 export default router;

@@ -52,12 +52,12 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
     if (!isLogin) {
       try {
         //Signup API call so that request is sent to backend to the route '/api/auth/signup' and the route will be handled by the controller
-        await signup({      
+        const result = await signup({      
           username: formData.username,
           email: formData.email,
           password: formData.password,
         });
-        setAuthenticated(true, formData.username); 
+        setAuthenticated(true, result.token); 
         alert('Signup successful!');
       } catch (error: any) {
         alert(error.response?.data?.message || 'Signup failed');
@@ -65,11 +65,11 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
     } else {
       try {
         //Login API call so that request is sent to backend to the route '/api/auth/login' and the route will be handled by the controller
-        await login({
+        const result = await login({
           username: formData. username,
           password: formData. password
         });
-        setAuthenticated(true, formData.username)
+        setAuthenticated(true, result.token);
         alert('Login successful'); 
       } catch (error: any) {
         alert(error.response?.data?.message || 'Login failed');

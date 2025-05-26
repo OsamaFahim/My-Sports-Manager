@@ -1,31 +1,39 @@
-import { MongoClient, Db } from "mongodb"; //a type that represents a mongodb type instance
-import dotenv from "dotenv";
+// Import Mongoose, which is an ODM (Object Data Modeling) library for MongoDB
+import mongoose from 'mongoose';
 
+// Load environment variables from .env file (e.g., MONGO_URI, DB_NAME)
+import dotenv from 'dotenv';
 dotenv.config();
 
-//Reading from enviroment variables
-const uri = process.env.MONGO_URI!;
-const dbName = process.env.DB_NAME || "Sportify";
+// Define the MongoDB connection URI and database name
+const MONGO_URI = process.env.MONGO_URI!;
+const DB_NAME = process.env.DB_NAME || 'Sportify';
 
-const client = new MongoClient(uri);
-
-//db can ether be a Db object (from MongoDB) or it can be null (in the beginning) when
-//no connection is made initially.
-let db: Db | null = null;
-export async function connectToMongo(): Promise<Db> {
-  //Singelton pattern is being followd if db has been connected then return the same instance
-  //and do not create it again
-  if (db) {
-    return db;
+/**
+ * Connects to MongoDB using Mongoose.
+ * This function ensures that only one connection is created (singleton behavior is built-in).
+ * 
+ * Mongoose automatically handles connection pooling, reconnection, and model reuse.
+ */
+export async function connectToMongo(): Promise<void> {
+  // Mongoose has a built-in connection state:
+  // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+  if (mongoose.connection.readyState >= 1) {
+    // If already connected or connecting, do nothing
+    return;
   }
 
   try {
-    await client.connect();
-    db = client.db(dbName)
-    //console.log("✅ Connected to MongoDB");
-    return db;
+    // Connect to MongoDB with the provided URI and database name
+    await mongoose.connect(MONGO_URI, {
+      dbName: DB_NAME, // Optional: you can also hardcode in URI, but this is cleaner
+    });
+
+    // Log only once, since connection is only created once
+    console.log('✅ Connected to MongoDB via Mongoose');
   } catch (err) {
-    //console.error("❌ MongoDB connection failed:", err);
-    process.exit(1);  
+    // Log the error and exit the process if connection fails
+    console.error('❌ Mongoose connection failed:', err);
+    process.exit(1);
   }
 }
