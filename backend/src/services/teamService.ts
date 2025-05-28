@@ -1,4 +1,4 @@
-import Team, { IPlayer } from '../models/Team';
+import Team from '../models/Team';
 
 export async function getTeamsByUsername(username: string) {
   return Team.find({ username }).lean();

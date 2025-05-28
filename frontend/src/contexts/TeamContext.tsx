@@ -38,6 +38,7 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await teamService.getTeams();
       setTeams(data);
     } catch (err) {
+      console.error('Error fetching teams:', err);
       setTeams([]);
     }
     setLoading(false);
@@ -53,18 +54,30 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isAuthenticated]);
 
   const addTeam = async (team: Omit<Team, '_id'>) => {
-    await teamService.createTeam(team);
-    await fetchTeams();
+    try {
+      await teamService.createTeam(team);
+      await fetchTeams();
+    } catch (error: any) {
+      console.error('Error creating team:', error?.response?.data?.message || error.message);
+    }
   };
 
   const updateTeam = async (id: string, team: Partial<Team>) => {
-    await teamService.updateTeam(id, team);
-    await fetchTeams();
+    try {
+      await teamService.updateTeam(id, team);
+      await fetchTeams();
+    } catch (error: any) {
+      console.error('Error updating team:', error?.response?.data?.message || error.message);
+    }
   };
 
   const deleteTeam = async (id: string) => {
-    await teamService.deleteTeam(id);
-    await fetchTeams();
+    try {
+      await teamService.deleteTeam(id);
+      await fetchTeams();
+    } catch (error: any) {
+      console.error('Error deleting team:', error?.response?.data?.message || error.message);
+    }
   };
 
   return (

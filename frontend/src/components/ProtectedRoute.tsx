@@ -7,16 +7,17 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  resourceName?: string; // e.g. "grounds", "matches", "teams"
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, resourceName = "this page" }) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2>You must be logged in to view this page.</h2>
-        <p>Please log in or sign up to manage your teams.</p>
+        <h2>Only logged in users can access and manage {resourceName}.</h2>
+        <p>Please log in or sign up to continue.</p>
       </div>
     );
   }

@@ -26,7 +26,7 @@ export async function connectToMongo(): Promise<void> {
   try {
     // Connect to MongoDB with the provided URI and database name
     await mongoose.connect(MONGO_URI, {
-      dbName: DB_NAME, // Optional: you can also hardcode in URI, but this is cleaner
+      dbName: DB_NAME, 
     });
 
     // Log only once, since connection is only created once

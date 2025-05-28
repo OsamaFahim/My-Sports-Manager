@@ -39,10 +39,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
         </li>
         <li>
           <Link
-            to="/Grounds"
-            className={pathname === '/Grounds' ? styles.active : undefined}
+            to="/grounds"
+            className={pathname === '/grounds' ? styles.active : undefined}
           >
-            Stats
+            Grounds
           </Link>
         </li>
       </ul>
