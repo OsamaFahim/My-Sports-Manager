@@ -17,7 +17,7 @@ async function initMongo() {
     const exists = dbs.databases.some((db) => db.name === dbName);
 
     if (!exists) {
-      console.log(`Creating database: ${dbName}`);
+      //console.log(`Creating database: ${dbName}`);
       const db = client.db(dbName);
       await db.collection("initCollection").insertOne({ createdAt: new Date() });
       //console.log(`✅ Database "${dbName}" created.`);

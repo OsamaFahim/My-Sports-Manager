@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import type { Request, Response } from 'express';
+import { errorHandler } from './middlewares/ErrorHandlerMiddleware';
 
 // Importing routes
 import authRoutes from './routes/auth';   // 👈 import Auth Routes
@@ -35,6 +36,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamsRoutes);
 app.use('/api/grounds', groundsRoutes);
 app.use('/api/matches', matchesRoutes);
+
+//Regustering the global error handler after all the routes
+app.use(errorHandler);
 
 // Connect to MongoDB and Start Server
 const PORT = process.env.PORT || 5000;

@@ -45,6 +45,14 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
             Grounds
           </Link>
         </li>
+        <li>
+          <Link
+            to="/Discussions"
+            className={pathname === '/Discussions' ? styles.active : undefined}
+          >
+            Discussions
+          </Link>
+        </li>
       </ul>
 
       <div className={styles.navButtons}>

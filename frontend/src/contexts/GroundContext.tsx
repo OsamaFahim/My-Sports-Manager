@@ -58,8 +58,9 @@ export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await fetchGrounds();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to add ground');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const updateGround = async (id: string, ground: Partial<Ground>) => {
@@ -70,8 +71,9 @@ export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await fetchGrounds();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to update ground');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const deleteGround = async (id: string) => {
@@ -82,8 +84,9 @@ export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       await fetchGrounds();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to delete ground');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

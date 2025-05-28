@@ -14,10 +14,11 @@ export async function createMatch(req: Request, res: Response) {
   if (!username) return res.status(401).json({ message: 'Unauthorized' });
 
   const { ground, teamA, teamB, datetime } = req.body;
-  if (!datetime) return res.status(400).json({ message: 'Date and time are required.' });
+  //No validation needs to be done here, as the frontend will ensure these fields are present
 
   const available = await isGroundAvailable(ground, datetime, username);
   if (!available) {
+    //console.log('400 error: Ground not available');
     return res.status(400).json({ message: 'This ground is not available within 1 hour of the selected time.' });
   }
 
@@ -30,11 +31,13 @@ export async function updateMatch(req: Request, res: Response) {
   if (!username) return res.status(401).json({ message: 'Unauthorized' });
 
   const { id } = req.params;
+  // No validation needs to be done here, as the frontend will ensure these fields are present
   const { ground, teamA, teamB, datetime } = req.body;
-  if (!datetime) return res.status(400).json({ message: 'Date and time are required.' });
 
+  //check if the ground is available, as the ground cannot be booked if a match is already scheduled within 1 hour of the selected time
   const available = await isGroundAvailable(ground, datetime, username, id);
   if (!available) {
+    //console.log('400 error: Ground not available');
     return res.status(400).json({ message: 'This ground is not available within 1 hour of the selected time.' });
   }
 

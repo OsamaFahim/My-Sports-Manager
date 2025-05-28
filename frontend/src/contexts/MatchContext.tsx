@@ -37,8 +37,9 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (err: any) {
       setMatches([]);
       setError(err?.response?.data?.message || 'Failed to fetch matches');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -64,9 +65,10 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       await fetchMatches();
     } catch (err: any) {
       throw err; // <-- propagate error so MatchForm can display it
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }
 
   // Accepts date and time, combines to datetime before sending to backend
   const updateMatch = async (id: string, match: { teamA: string; teamB: string; ground: string; date: string; time: string }) => {
@@ -82,8 +84,9 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       await fetchMatches();
     } catch (err: any) {
       throw err;
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const deleteMatch = async (id: string) => {
@@ -94,8 +97,9 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       await fetchMatches();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to delete match');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

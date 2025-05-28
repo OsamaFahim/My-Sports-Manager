@@ -1,6 +1,5 @@
 import express from 'express';
 import * as authController from '../controllers/authController';
-import { errorHandler } from '../middlewares/ErrorHandlerMiddleware';
 
 const router = express.Router();
 
@@ -11,8 +10,5 @@ function wrap(fn: any) {
 
 router.post('/signup', wrap(authController.signup));
 router.post('/login', wrap(authController.login));
-
-// Centralized error handler (for async errors)
-router.use(errorHandler);
 
 export default router;

@@ -40,8 +40,9 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.error('Error fetching teams:', err);
       setTeams([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {

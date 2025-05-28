@@ -1,6 +1,5 @@
 import express from 'express';
 import { authenticateJWT } from '../middlewares/authMiddleware';
-import { errorHandler } from '../middlewares/ErrorHandlerMiddleware';
 import * as teamController from '../controllers/teamController';
 
 const router = express.Router();
@@ -22,8 +21,5 @@ router.delete('/:id', wrap(teamController.deleteTeam));
 router.post('/:id/players', wrap(teamController.addPlayer));
 router.put('/:teamId/players/:playerId', wrap(teamController.updatePlayer));
 router.delete('/:teamId/players/:playerId', wrap(teamController.deletePlayer));
-
-// Centralized error handler (for async errors)
-router.use(errorHandler);
 
 export default router;

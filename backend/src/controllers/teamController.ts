@@ -27,7 +27,6 @@ export async function updateTeam(req: Request, res: Response) {
 export async function deleteTeam(req: Request, res: Response) {
   const { id } = req.params;
   const result = await teamService.deleteTeam(id);
-  console.log('Deleted Team:', result);
   res.json(result);
 }
 
@@ -35,7 +34,6 @@ export async function addPlayer(req: Request, res: Response) {
   const { id } = req.params;
   const player = { ...req.body };
   const result = await teamService.addPlayer(id, player);
-  console.log('Added player:', result);
   res.json(result);
 }
 

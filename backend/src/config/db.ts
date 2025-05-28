@@ -18,6 +18,7 @@ const DB_NAME = process.env.DB_NAME || 'Sportify';
 export async function connectToMongo(): Promise<void> {
   // Mongoose has a built-in connection state:
   // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+  //Gives Singlelton Pattern effect, ensuring only one connection is created
   if (mongoose.connection.readyState >= 1) {
     // If already connected or connecting, do nothing
     return;
