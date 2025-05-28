@@ -30,10 +30,10 @@ export async function connectToMongo(): Promise<void> {
     });
 
     // Log only once, since connection is only created once
-    console.log('✅ Connected to MongoDB via Mongoose');
+    console.log('Connected to MongoDB via Mongoose');
   } catch (err) {
     // Log the error and exit the process if connection fails
-    console.error('❌ Mongoose connection failed:', err);
+    console.error('Mongoose connection failed:', err);
     process.exit(1);
   }
 }
