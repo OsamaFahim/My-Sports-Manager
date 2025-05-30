@@ -9,10 +9,14 @@ import { TeamProvider } from './contexts/TeamContext';
 import { MatchProvider } from './contexts/MatchContext';
 import { GroundProvider } from './contexts/GroundContext';
 import { DiscussionProvider } from './contexts/DiscussionContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import TeamsPage from './components/Teams/TeamsPage';
 import MatchesPage from './components/Matches/MatchesPage';
 import GroundsPage from './components/Grounds/GroundsPage';
-import DiscussionsPage from './components/Discussions/DiscussionsPage'; 
+import DiscussionsPage from './components/Discussions/DiscussionsPage';
+import NotificationsPage from './components/Notifications/NotificationsPage';
+import NotificationBell from './components/Notifications/NotificationBell';
+import './components/Notifications/floatingBell.css';
 
 const App: React.FC = () => {
   const [showForm, setShowForm] = useState<'none' | 'login' | 'signup'>('none');
@@ -22,44 +26,65 @@ const App: React.FC = () => {
       <TeamProvider>
         <MatchProvider>
           <GroundProvider>
-            <DiscussionProvider> {/* <-- Wrap with DiscussionProvider */}
-              <BrowserRouter>
-                <Navbar onAuthAction={setShowForm} />
-                <AuthLayout>
-                  <Routes>
-                    <Route path="/" element={<LandingPage showForm={showForm} setShowForm={setShowForm} />} />
-                    <Route
-                      path="/teams"
-                      element={
-                        <ProtectedRoute resourceName="teams">
-                          <TeamsPage />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/matches"
-                      element={
-                        <ProtectedRoute resourceName="matches">
-                          <MatchesPage />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/grounds"
-                      element={
-                        <ProtectedRoute resourceName="grounds">
-                          <GroundsPage />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                     // <-- Public, not wrapped in ProtectedRoute
-                      path="/discussions"
-                      element={<DiscussionsPage />}
-                    />
-                  </Routes>
-                </AuthLayout>
-              </BrowserRouter>
+            <DiscussionProvider>
+              <NotificationProvider>
+                <BrowserRouter>
+                  <div style={{ position: 'relative', minHeight: '100vh' }}>
+                    <Navbar onAuthAction={setShowForm} />
+                    {/* Place NotificationBell absolutely within the main layout */}
+                    <NotificationBell />
+                    <AuthLayout>
+                      <Routes>
+                        <Route
+                          path="/"
+                          element={
+                            <LandingPage
+                              showForm={showForm}
+                              setShowForm={setShowForm}
+                            />
+                          }
+                        />
+                        <Route
+                          path="/teams"
+                          element={
+                            <ProtectedRoute resourceName="teams">
+                              <TeamsPage />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/matches"
+                          element={
+                            <ProtectedRoute resourceName="matches">
+                              <MatchesPage />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/grounds"
+                          element={
+                            <ProtectedRoute resourceName="grounds">
+                              <GroundsPage />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/notifications"
+                          element={
+                            <ProtectedRoute>
+                              <NotificationsPage />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/discussions"
+                          element={<DiscussionsPage />}
+                        />
+                      </Routes>
+                    </AuthLayout>
+                  </div>
+                </BrowserRouter>
+              </NotificationProvider>
             </DiscussionProvider>
           </GroundProvider>
         </MatchProvider>

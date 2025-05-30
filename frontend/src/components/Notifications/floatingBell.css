@@ -1,0 +1,13 @@
+.floatingNotificationBell {
+  position: fixed;
+  top: 110px;      
+  right: 25px;    
+  z-index: 2001;
+}
+
+@media (max-width: 700px) {
+  .floatingNotificationBell {
+    top: 40px;    
+    right: 12px;
+  }
+}

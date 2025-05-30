@@ -1,0 +1,31 @@
+.bellWrapper {
+  position: relative;
+  display: inline-block;
+  margin-right: 1.5rem;
+}
+
+.bellIcon {
+  color: #00e676;
+  font-size: 2rem;
+  vertical-align: middle;
+  transition: color 0.2s;
+}
+
+.bellIcon:hover {
+  color: #00c764;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #00e676;
+  color: #0d1117;
+  border-radius: 50%;
+  padding: 0.18em 0.5em;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border: 2px solid #181a1b;
+  min-width: 1.2em;
+  text-align: center;
+}
