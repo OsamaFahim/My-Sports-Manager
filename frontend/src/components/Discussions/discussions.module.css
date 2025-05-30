@@ -1,0 +1,24 @@
+.container { max-width: 700px; margin: auto; padding: 1rem; }
+.title { font-size: 2rem; text-align: center; }
+.subtitle { text-align: center; color: #8b949e; }
+.addButton { margin: 1rem 0; background: #00e676; color: #0d1117; border: none; border-radius: 6px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; }
+.discussionList { list-style: none; padding: 0; }
+.discussionItem { background: #161b22; margin-bottom: 1.5rem; border-radius: 8px; padding: 1rem; }
+.discussionHeader { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.author { color: #00e676; font-weight: 600; }
+.editBtn { color: #00e676; background: none; border: none; cursor: pointer; margin-right: 0.5rem; font-weight: 500; }
+.deleteBtn { color: #ff4d4d; background: none; border: none; cursor: pointer; font-weight: 500; }
+.cancelBtn { color: #8b949e; background: none; border: none; cursor: pointer; margin-left: 0.5rem; }
+.form, .commentForm { display: flex; flex-direction: column; gap: 0.5rem; }
+.input, .textarea { padding: 0.7rem; border-radius: 6px; border: 1px solid #222c32; background: #181f23; color: #e6edf3; }
+.submitBtn { background: #00e676; color: #0d1117; border: none; border-radius: 6px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; }
+.commentSection { margin-top: 1rem; }
+.comment { background: #222c32; border-radius: 6px; margin-top: 0.5rem; padding: 0.5rem 1rem; }
+.commentHeader { display: flex; gap: 1rem; font-size: 0.9rem; color: #8b949e; align-items: center; }
+.commentAuthor { font-weight: 600; }
+.commentContent { margin: 0.5rem 0; }
+@media (max-width: 600px) {
+  .container { padding: 0.5rem; }
+  .discussionItem { padding: 0.5rem; }
+  .input, .textarea { font-size: 1rem; }
+}

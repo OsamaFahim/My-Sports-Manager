@@ -8,9 +8,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import { TeamProvider } from './contexts/TeamContext';
 import { MatchProvider } from './contexts/MatchContext';
 import { GroundProvider } from './contexts/GroundContext';
+import { DiscussionProvider } from './contexts/DiscussionContext';
 import TeamsPage from './components/Teams/TeamsPage';
 import MatchesPage from './components/Matches/MatchesPage';
 import GroundsPage from './components/Grounds/GroundsPage';
+import DiscussionsPage from './components/Discussions/DiscussionsPage'; 
 
 const App: React.FC = () => {
   const [showForm, setShowForm] = useState<'none' | 'login' | 'signup'>('none');
@@ -20,38 +22,45 @@ const App: React.FC = () => {
       <TeamProvider>
         <MatchProvider>
           <GroundProvider>
-            <BrowserRouter>
-              <Navbar onAuthAction={setShowForm} />
-              <AuthLayout>
-                <Routes>
-                  <Route path="/" element={<LandingPage showForm={showForm} setShowForm={setShowForm} />} />
-                  <Route
-                    path="/teams"
-                    element={
-                      <ProtectedRoute resourceName="teams">
-                        <TeamsPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/matches"
-                    element={
-                      <ProtectedRoute resourceName="matches">
-                        <MatchesPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/grounds"
-                    element={
-                      <ProtectedRoute resourceName="grounds">
-                        <GroundsPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Routes>
-              </AuthLayout>
-            </BrowserRouter>
+            <DiscussionProvider> {/* <-- Wrap with DiscussionProvider */}
+              <BrowserRouter>
+                <Navbar onAuthAction={setShowForm} />
+                <AuthLayout>
+                  <Routes>
+                    <Route path="/" element={<LandingPage showForm={showForm} setShowForm={setShowForm} />} />
+                    <Route
+                      path="/teams"
+                      element={
+                        <ProtectedRoute resourceName="teams">
+                          <TeamsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/matches"
+                      element={
+                        <ProtectedRoute resourceName="matches">
+                          <MatchesPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/grounds"
+                      element={
+                        <ProtectedRoute resourceName="grounds">
+                          <GroundsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                     // <-- Public, not wrapped in ProtectedRoute
+                      path="/discussions"
+                      element={<DiscussionsPage />}
+                    />
+                  </Routes>
+                </AuthLayout>
+              </BrowserRouter>
+            </DiscussionProvider>
           </GroundProvider>
         </MatchProvider>
       </TeamProvider>

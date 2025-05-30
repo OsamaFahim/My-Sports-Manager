@@ -9,6 +9,8 @@ import authRoutes from './routes/auth';   // 👈 import Auth Routes
 import teamsRoutes from './routes/teams'; // 👈 import Teams Routes
 import groundsRoutes from './routes/ground'; // 👈 import Grounds Routes
 import matchesRoutes from './routes/matches'; // 👈 import Matches Routes
+import discussionsRoutes from './routes/discussions'; // <-- Add this line
+
 
 // Importing MongoDB connection
 import { connectToMongo } from './config/db';    // 👈 import MongoDB connection
@@ -36,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamsRoutes);
 app.use('/api/grounds', groundsRoutes);
 app.use('/api/matches', matchesRoutes);
+app.use('/api/discussions', discussionsRoutes); 
 
 //Regustering the global error handler after all the routes
 app.use(errorHandler);
