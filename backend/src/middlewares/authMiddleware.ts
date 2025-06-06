@@ -15,7 +15,11 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'yoursecret') as { username: string };
+    if (!process.env.JWT_SECRET) {
+      res.status(500).json({ message: 'JWT secret not configured' });
+      return;
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as { username: string };
     (req as any).user = { username: decoded.username };
     next();
   } catch (err) {

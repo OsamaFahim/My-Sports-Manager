@@ -60,8 +60,6 @@ export async function createComment({ discussionId, parentId, content, username 
   return comment;
 }
 
-// ...existing code...
-// ...existing code...
 export async function deleteComment(
   id: string,
   username: string | null

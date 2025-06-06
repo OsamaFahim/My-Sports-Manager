@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 //Centralized error handler for the application
-export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+export function errorHandler(err: any, req: Request, res: Response) {
   console.error('Server error:', err);
   const status = err.status || 500;
   const message = err.message || 'Internal server error';
