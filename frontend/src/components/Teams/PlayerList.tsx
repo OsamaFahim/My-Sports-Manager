@@ -1,6 +1,6 @@
 import React from 'react';
 import { Team, Player } from '../../contexts/TeamContext';
-import styles from '../MainPage/MainPage.module.css';
+import styles from '../Management/ManagementPages.module.css';
 import { deletePlayer } from '../../services/TeamService';
 import { useTeams } from '../../contexts/TeamContext';
 
@@ -18,34 +18,40 @@ const PlayerList: React.FC<PlayerListProps> = ({ team, onEditPlayer }) => {
       await fetchTeams();
     }
   };
-
   return (
-    <ul style={{ padding: 0, listStyle: 'none', marginTop: 8 }}>
-      {team.players.length === 0 && <li>No players yet.</li>}
+    <div className={styles.playersList}>
+      {team.players.length === 0 && (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>👥</div>
+          <h4 className={styles.emptyTitle}>No Players Yet</h4>
+          <p className={styles.emptyDescription}>Add players to this team to get started.</p>
+        </div>
+      )}
       {team.players.map(player => (
-        <li key={player._id} className={styles.formGroup} style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span>
-            <strong>{player.name}</strong> | Age: {player.age} | Position: {player.position} | Stats: {player.stats}
-          </span>
-          <span>
+        <div key={player._id} className={styles.playerCard}>
+          <div className={styles.playerInfo}>
+            <div className={styles.playerName}>{player.name}</div>
+            <div className={styles.playerStats}>
+              Age: {player.age} | Position: {player.position} | Stats: {player.stats}
+            </div>
+          </div>
+          <div className={styles.listItemActions}>
             <button
-              className={styles.authLink}
-              style={{ marginRight: 8 }}
+              className={`${styles.actionButton} ${styles.editButton}`}
               onClick={() => onEditPlayer && onEditPlayer(player)}
             >
-              Edit
+              ✏️ Edit
             </button>
             <button
-              className={styles.authLink}
-              style={{ color: '#ff4d4d' }}
+              className={`${styles.actionButton} ${styles.deleteButton}`}
               onClick={() => handleDelete(player._id!)}
             >
-              Delete
+              🗑️ Delete
             </button>
-          </span>
-        </li>
+          </div>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 };
 

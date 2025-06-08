@@ -28,12 +28,11 @@ export async function signupService({ username, email, password }: SignupInput):
   if (existingUserEmail) {
     throw createHttpError('Email already in use', 409); // Fixed the incorrect message
   }
-
   // Hash password before storing in DB
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Insert new user into the database
-  await User.create({ username, email, password: hashedPassword });
+  const newUser = await User.create({ username, email, password: hashedPassword });
 
   // ✅ Create JWT token (recommended for authentication)
   // Reason: After signing up, the user is usually logged in automatically.
@@ -44,7 +43,10 @@ export async function signupService({ username, email, password }: SignupInput):
   // Example: Creating, editing, or deleting a team should only be allowed for logged-in users.
   // The frontend sends this token on every request to those routes.
   // The backend checks the token and allows access only if it's valid.
-  const token = jwt.sign({ username }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
+  const token = jwt.sign({ 
+    userId: newUser._id, 
+    username: newUser.username 
+  }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
 
   return { message: 'User created successfully', token };
 }
@@ -61,7 +63,6 @@ export async function LoginService({ username, password }: LoginInput): Promise<
   if (!validUser) {
     throw createHttpError('Password is not valid', 401);
   }
-
   // ✅ Create JWT token after successful login
   // Reason: This token is crucial for maintaining authenticated sessions in a stateless manner.
   // Once logged in, the frontend stores this token and includes it in the Authorization header
@@ -70,7 +71,10 @@ export async function LoginService({ username, password }: LoginInput): Promise<
   // Example: In our app, only authenticated users can create, update, or delete their teams.
   // Without a valid JWT token, the user will only be allowed to see public teams or none at all.
   // The backend middleware (like authenticateJWT) uses this token to verify the user's identity.
-  const token = jwt.sign({ username }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
+  const token = jwt.sign({ 
+    userId: validUsername._id, 
+    username: validUsername.username 
+  }, process.env.JWT_SECRET || 'yoursecret', { expiresIn: '1h' });
 
   return { message: 'User logged in successfully', token };
 }

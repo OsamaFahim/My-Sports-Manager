@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../MainPage/MainPage.module.css';
+import styles from '../Management/ManagementPages.module.css';
 import { useMatches } from '../../contexts/MatchContext';
 
 interface MatchListProps {
@@ -8,49 +8,54 @@ interface MatchListProps {
 
 const MatchList: React.FC<MatchListProps> = ({ setEditingMatchId }) => {
   const { matches, deleteMatch } = useMatches();
-
-  if (matches.length === 0) return <p>No matches scheduled yet.</p>;
+  if (matches.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <div className={styles.emptyIcon}>⚽</div>
+        <h3 className={styles.emptyTitle}>No Matches Scheduled</h3>
+        <p className={styles.emptyDescription}>
+          Schedule your first match to get started with match management.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <ul style={{ padding: 0, listStyle: 'none' }}>
+    <div className={styles.listContainer}>
       {matches.map(match => {
         const dt = new Date(match.datetime);
         const dateStr = dt.toLocaleDateString();
         const timeStr = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         return (
-          <li
-            key={match._id}
-            className={styles.formGroup}
-            style={{
-              marginBottom: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span>
-              <strong>{match.teamA}</strong> vs <strong>{match.teamB}</strong> | Venue: {match.ground} | {dateStr} at {timeStr}
-            </span>
-            <span>
-              <button
-                className={styles.authLink}
-                style={{ marginRight: 8 }}
-                onClick={() => setEditingMatchId(match._id!)}
-              >
-                Edit
-              </button>
-              <button
-                className={styles.authLink}
-                style={{ color: '#ff4d4d' }}
-                onClick={() => deleteMatch(match._id!)}
-              >
-                Delete
-              </button>
-            </span>
-          </li>
+          <div key={match._id} className={styles.listItem}>
+            <div className={styles.listItemHeader}>
+              <h3 className={styles.listItemTitle}>
+                {match.teamA} vs {match.teamB}
+              </h3>
+              <div className={styles.listItemActions}>
+                <button
+                  className={`${styles.actionButton} ${styles.editButton}`}
+                  onClick={() => setEditingMatchId(match._id!)}
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  className={`${styles.actionButton} ${styles.deleteButton}`}
+                  onClick={() => deleteMatch(match._id!)}
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+            <div className={styles.listItemInfo}>
+              <p><strong>🏟️ Venue:</strong> {match.ground}</p>
+              <p><strong>📅 Date:</strong> {dateStr}</p>
+              <p><strong>⏰ Time:</strong> {timeStr}</p>
+            </div>
+          </div>
         );
       })}
-    </ul>
+    </div>
   );
 };
 

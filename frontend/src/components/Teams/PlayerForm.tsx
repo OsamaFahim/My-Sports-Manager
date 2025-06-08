@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../MainPage/MainPage.module.css';
+import styles from '../Management/ManagementPages.module.css';
 import { addPlayer, updatePlayer } from '../../services/TeamService';
 import { useTeams } from '../../contexts/TeamContext';
 import { Player } from '../../contexts/TeamContext';
@@ -53,38 +53,80 @@ const PlayerForm: React.FC<PlayerFormProps> = ({ teamId, onDone, editingPlayer }
     await fetchTeams();
     onDone();
   };
-
   return (
-    <form className={styles.authForm} onSubmit={handleSubmit} style={{ marginTop: 12 }}>
+    <form className={styles.form} onSubmit={handleSubmit} style={{ marginTop: 12 }}>
       <div className={styles.formGroup}>
-        <label>Name</label>
-        <input name="name" value={form.name} onChange={handleChange} required className={styles.authInput} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>👤</span>
+          Name
+        </label>
+        <input 
+          name="name" 
+          value={form.name} 
+          onChange={handleChange} 
+          required 
+          className={styles.input}
+          placeholder="Enter player name"
+        />
       </div>
       <div className={styles.formGroup}>
-        <label>Age</label>
-        <input name="age" value={form.age} onChange={handleChange} required className={styles.authInput} type="number" min="1" />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>🎂</span>
+          Age
+        </label>
+        <input 
+          name="age" 
+          value={form.age} 
+          onChange={handleChange} 
+          required 
+          className={styles.input} 
+          type="number" 
+          min="1"
+          placeholder="Enter player age"
+        />
       </div>
       <div className={styles.formGroup}>
-        <label>Position</label>
-        <input name="position" value={form.position} onChange={handleChange} required className={styles.authInput} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>⚽</span>
+          Position
+        </label>
+        <input 
+          name="position" 
+          value={form.position} 
+          onChange={handleChange} 
+          required 
+          className={styles.input}
+          placeholder="Enter player position"
+        />
       </div>
       <div className={styles.formGroup}>
-        <label>Stats</label>
-        <input name="stats" value={form.stats} onChange={handleChange} required className={styles.authInput} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>📊</span>
+          Stats
+        </label>
+        <input 
+          name="stats" 
+          value={form.stats} 
+          onChange={handleChange} 
+          required 
+          className={styles.input}
+          placeholder="Enter player statistics"
+        />
       </div>
-      <button className={styles.authButton} type="submit">
-        {editingPlayer ? 'Update Player' : 'Add Player'}
-      </button>
-      {editingPlayer && (
-        <button
-          type="button"
-          className={styles.authLink}
-          style={{ marginLeft: 16 }}
-          onClick={onDone}
-        >
-          Cancel
+      <div className={styles.buttonGroup}>
+        <button className={styles.submitButton} type="submit">
+          {editingPlayer ? 'Update Player' : 'Add Player'}
         </button>
-      )}
+        {editingPlayer && (
+          <button
+            type="button"
+            className={styles.cancelButton}
+            onClick={onDone}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 };

@@ -10,15 +10,21 @@ const DiscussionsPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Discussions</h2>
-      <p className={styles.subtitle}>Share your thoughts, ask questions, and discuss anything sports-related!</p>
-      {isAuthenticated && (
-        <button className={styles.addButton} onClick={() => setShowForm(v => !v)}>
-          {showForm ? 'Cancel' : 'Add Discussion'}
-        </button>
-      )}
-      {showForm && <DiscussionForm onDone={() => setShowForm(false)} />}
-      <DiscussionList />
+      <div className={styles.wrapper}>
+        <div className={styles.pageHeader}>
+          <h2 className={styles.title}>Discussions</h2>
+          <p className={styles.subtitle}>Share your thoughts, ask questions, and discuss anything sports-related!</p>
+        </div>
+        
+        {isAuthenticated && (
+          <button className={styles.addButton} onClick={() => setShowForm(v => !v)}>
+            {showForm ? 'Cancel' : 'Start New Discussion'}
+          </button>
+        )}
+        
+        {showForm && <DiscussionForm onDone={() => setShowForm(false)} />}
+        <DiscussionList />
+      </div>
     </div>
   );
 };

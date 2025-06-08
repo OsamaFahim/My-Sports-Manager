@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../MainPage/MainPage.module.css';
+import styles from '../Management/ManagementPages.module.css';
 import { useGrounds } from '../../contexts/GroundContext';
 
 interface GroundFormProps {
@@ -48,38 +48,80 @@ const GroundForm: React.FC<GroundFormProps> = ({ editingGroundId, setEditingGrou
     }
     setForm({ name: '', location: '', capacity: '', facilities: '' });
   };
-
   return (
-    <form className={styles.authForm} onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+    <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
-        <label>Name</label>
-        <input name="name" value={form.name} onChange={handleChange} required className={styles.authInput} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>🏟️</span>
+          Name
+        </label>
+        <input 
+          name="name" 
+          value={form.name} 
+          onChange={handleChange} 
+          required 
+          className={styles.input}
+          placeholder="Enter ground name"
+        />
       </div>
       <div className={styles.formGroup}>
-        <label>Location</label>
-        <input name="location" value={form.location} onChange={handleChange} required className={styles.authInput} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>📍</span>
+          Location
+        </label>
+        <input 
+          name="location" 
+          value={form.location} 
+          onChange={handleChange} 
+          required 
+          className={styles.input}
+          placeholder="Enter ground location"
+        />
       </div>
       <div className={styles.formGroup}>
-        <label>Capacity</label>
-        <input type="number" name="capacity" value={form.capacity} onChange={handleChange} required className={styles.authInput} min={1} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>👥</span>
+          Capacity
+        </label>
+        <input 
+          type="number" 
+          name="capacity" 
+          value={form.capacity} 
+          onChange={handleChange} 
+          required 
+          className={styles.input} 
+          min={1}
+          placeholder="Enter seating capacity"
+        />
       </div>
       <div className={styles.formGroup}>
-        <label>Facilities</label>
-        <textarea name="facilities" value={form.facilities} onChange={handleChange} required className={styles.authInput} />
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>🏢</span>
+          Facilities
+        </label>
+        <textarea 
+          name="facilities" 
+          value={form.facilities} 
+          onChange={handleChange} 
+          required 
+          className={styles.textarea}
+          placeholder="Describe available facilities (parking, restrooms, etc.)"
+        />
       </div>
-      <button className={styles.authButton} type="submit">
-        {isEditing ? 'Update Ground' : 'Add Ground'}
-      </button>
-      {isEditing && (
-        <button
-          type="button"
-          className={styles.authLink}
-          style={{ marginLeft: 16 }}
-          onClick={() => setEditingGroundId(null)}
-        >
-          Cancel
+      <div className={styles.buttonGroup}>
+        <button className={styles.submitButton} type="submit">
+          {isEditing ? 'Update Ground' : 'Add Ground'}
         </button>
-      )}
+        {isEditing && (
+          <button
+            type="button"
+            className={styles.cancelButton}
+            onClick={() => setEditingGroundId(null)}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 };

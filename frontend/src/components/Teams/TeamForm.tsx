@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../MainPage/MainPage.module.css';
+import styles from '../Management/ManagementPages.module.css';
 import { useTeams } from '../../contexts/TeamContext';
 
 interface TeamFormProps {
@@ -31,33 +31,36 @@ const TeamForm: React.FC<TeamFormProps> = ({ editingTeamId, setEditingTeam }) =>
     }
     setName('');
   };
-
   return (
-    <form className={styles.authForm} onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+    <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
-        <label htmlFor="teamName">Team Name</label>
+        <label htmlFor="teamName" className={styles.label}>
+          <span className={styles.labelIcon}>⚽</span>
+          Team Name
+        </label>
         <input
           id="teamName"
-          className={styles.authInput}
+          className={styles.input}
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Enter team name"
           required
         />
       </div>
-      <button className={styles.authButton} type="submit">
-        {isEditing ? 'Update Team' : 'Add Team'}
-      </button>
-      {isEditing && (
-        <button
-          type="button"
-          className={styles.authLink}
-          style={{ marginLeft: 16 }}
-          onClick={() => setEditingTeam(null)}
-        >
-          Cancel
+      <div className={styles.buttonGroup}>
+        <button className={styles.submitButton} type="submit">
+          {isEditing ? 'Update Team' : 'Add Team'}
         </button>
-      )}
+        {isEditing && (
+          <button
+            type="button"
+            className={styles.cancelButton}
+            onClick={() => setEditingTeam(null)}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 };

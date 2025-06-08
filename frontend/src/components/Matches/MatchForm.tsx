@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../MainPage/MainPage.module.css';
+import styles from '../Management/ManagementPages.module.css';
 import { useMatches } from '../../contexts/MatchContext';
 import { useTeams } from '../../contexts/TeamContext';
 import { useGrounds } from '../../contexts/GroundContext';
@@ -64,9 +64,7 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
     setErrors(validation.errors);
     setSubmitError(null);
 
-    if (!validation.isValid) return;
-
-    try {
+    if (!validation.isValid) return;    try {
       if (isEditing && editingMatchId) {
         await updateMatch(editingMatchId, form);
         setEditingMatchId(null);
@@ -75,33 +73,39 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
       }
       setForm({ teamA: '', teamB: '', ground: '', date: '', time: '' });
       setSubmitError(null); // Clear error on success
-    } catch (err: any) {
-      setSubmitError(
-        err?.response?.data?.message ||
-        err?.message ||
-        'Failed to save match. Please try again.'
-      );
+    } catch (err: unknown) {
+      const errorMessage = 
+        (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
+        (err as { message?: string })?.message ||
+        'Failed to save match. Please try again.';
+      setSubmitError(errorMessage);
     }
   };
-
   if (!grounds || grounds.length === 0) {
     return (
-      <div className={styles.errorMessage} style={{ marginBottom: 16 }}>
-        No grounds are registered for now. Please add a ground before scheduling a match.
+      <div className={styles.emptyState}>
+        <div className={styles.emptyIcon}>🏟️</div>
+        <h3 className={styles.emptyTitle}>No Grounds Available</h3>
+        <p className={styles.emptyDescription}>
+          No grounds are registered for now. Please add a ground before scheduling a match.
+        </p>
       </div>
     );
   }
 
   return (
-    <form className={styles.authForm} onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+    <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
-        <label>Team A</label>
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>🏆</span>
+          Team A
+        </label>
         <select
           name="teamA"
           value={form.teamA}
           onChange={handleChange}
           required
-          className={styles.authInput}
+          className={styles.select}
         >
           <option value="">Select Team A</option>
           {teams.map(team => (
@@ -113,15 +117,17 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
         {errors.teamA && <div className={styles.errorMessage}>{errors.teamA}</div>}
       </div>
       <div className={styles.formGroup}>
-        <label>Team B</label>
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>🏆</span>
+          Team B
+        </label>
         <select
           name="teamB"
           value={form.teamB}
           onChange={handleChange}
           required
-          className={styles.authInput}
-        >
-          <option value="">Select Team B</option>
+          className={styles.select}
+        >        <option value="">Select Team B</option>
           {teams.map(team => (
             <option key={team._id} value={team.name}>
               {team.name}
@@ -131,13 +137,16 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
         {errors.teamB && <div className={styles.errorMessage}>{errors.teamB}</div>}
       </div>
       <div className={styles.formGroup}>
-        <label>Ground</label>
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>🏟️</span>
+          Ground
+        </label>
         <select
           name="ground"
           value={form.ground}
           onChange={handleChange}
           required
-          className={styles.authInput}
+          className={styles.select}
         >
           <option value="">Select Ground</option>
           {grounds.map(ground => (
@@ -149,42 +158,48 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
         {errors.ground && <div className={styles.errorMessage}>{errors.ground}</div>}
       </div>
       <div className={styles.formGroup}>
-        <label>Date</label>
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>📅</span>
+          Date
+        </label>
         <input
           type="date"
           name="date"
           value={form.date}
           onChange={handleChange}
           required
-          className={styles.authInput}
+          className={styles.input}
         />
         {errors.date && <div className={styles.errorMessage}>{errors.date}</div>}
       </div>
       <div className={styles.formGroup}>
-        <label>Time</label>
+        <label className={styles.label}>
+          <span className={styles.labelIcon}>⏰</span>
+          Time
+        </label>
         <input
           type="time"
           name="time"
           value={form.time}
           onChange={handleChange}
           required
-          className={styles.authInput}
-        />
+          className={styles.input}        />
         {errors.time && <div className={styles.errorMessage}>{errors.time}</div>}
       </div>
-      <button className={styles.authButton} type="submit" disabled={loading}>
-        {isEditing ? 'Update Match' : 'Schedule Match'}
-      </button>
-      {isEditing && (
-        <button
-          type="button"
-          className={styles.authLink}
-          style={{ marginLeft: 16 }}
-          onClick={() => setEditingMatchId(null)}
-        >
-          Cancel
+      <div className={styles.buttonGroup}>
+        <button className={styles.submitButton} type="submit" disabled={loading}>
+          {isEditing ? 'Update Match' : 'Schedule Match'}
         </button>
-      )}
+        {isEditing && (
+          <button
+            type="button"
+            className={styles.cancelButton}
+            onClick={() => setEditingMatchId(null)}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
       {submitError && <div className={styles.errorMessage}>{submitError}</div>}
     </form>
   );

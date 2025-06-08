@@ -8,14 +8,13 @@ const DiscussionList: React.FC = () => {
   const { discussions, isAuthenticated, username, deleteDiscussion} = useDiscussions();
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (!discussions.length) return <p>No discussions yet. Be the first to post!</p>;
+  if (!discussions.length) return <p className={styles.noDiscussionsMessage}>No discussions yet. Be the first to post!</p>;
 
   return (
     <ul className={styles.discussionList}>
       {discussions.map(discussion => (
-        <li key={discussion._id} className={styles.discussionItem}>
-          <div className={styles.discussionHeader}>
-            <h3>{discussion.title}</h3>
+        <li key={discussion._id} className={styles.discussionItem}>          <div className={styles.discussionHeader}>
+            <h3 className={styles.discussionTitle}>{discussion.title}</h3>
             <span className={styles.author}>
               {discussion.username || 'Anonymous'}
             </span>
@@ -35,9 +34,8 @@ const DiscussionList: React.FC = () => {
               onDone={() => setEditingId(null)}
               initial={discussion}
               editingId={editingId}
-            />
-          ) : (
-            <p>{discussion.content}</p>
+            />          ) : (
+            <p className={styles.discussionContent}>{discussion.content}</p>
           )}
           <CommentSection discussionId={discussion._id} />
         </li>

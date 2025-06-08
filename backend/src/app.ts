@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import type { Request, Response } from 'express';
 import { errorHandler } from './middlewares/ErrorHandlerMiddleware';
 
+// Importing services
+import OrderStatusService from './services/orderStatusService';
+
 // Importing routes
 import authRoutes from './routes/auth';   // 👈 import Auth Routes
 import teamsRoutes from './routes/teams'; // 👈 import Teams Routes
@@ -11,6 +14,9 @@ import groundsRoutes from './routes/ground'; // 👈 import Grounds Routes
 import matchesRoutes from './routes/matches'; // 👈 import Matches Routes
 import discussionsRoutes from './routes/discussions'; // import Discussion Routes
 import notificationsRoutes from './routes/notifications'; //import notifications Routes
+import productsRoutes from './routes/products'; // 👈 import Products Routes
+import orderRoutes from './routes/orderRoutes'; // 👈 import Order Routes
+import statisticsRoutes from './routes/statistics'; // 👈 import Statistics Routes
 
 
 
@@ -42,6 +48,9 @@ app.use('/api/grounds', groundsRoutes);
 app.use('/api/matches', matchesRoutes);
 app.use('/api/discussions', discussionsRoutes); 
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/statistics', statisticsRoutes);
 
 
 //Regustering the global error handler after all the routes
@@ -53,6 +62,11 @@ const PORT = process.env.PORT || 5000;
 (async () => {
   try {
     await connectToMongo(); // 👈 ensure MongoDB is connected before starting the server
+    
+    // Start automated order status progression
+    const orderStatusService = OrderStatusService.getInstance();
+    orderStatusService.startAutomatedStatusProgression();
+    
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });

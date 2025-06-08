@@ -6,8 +6,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Define the MongoDB connection URI and database name
-const MONGO_URI = process.env.MONGO_URI!;
+const MONGO_URI = process.env.MONGO_URI;
 const DB_NAME = process.env.DB_NAME || 'Sportify';
+
+// Validate that MONGO_URI is defined
+if (!MONGO_URI) {
+  console.error('❌ MONGO_URI is not defined in environment variables');
+  console.error('Make sure you have a .env file with MONGO_URI set');
+  process.exit(1);
+}
 
 /**
  * Connects to MongoDB using Mongoose.
@@ -23,10 +30,9 @@ export async function connectToMongo(): Promise<void> {
     // If already connected or connecting, do nothing
     return;
   }
-
   try {
     // Connect to MongoDB with the provided URI and database name
-    await mongoose.connect(MONGO_URI, {
+    await mongoose.connect(MONGO_URI as string, {
       dbName: DB_NAME, 
     });
 

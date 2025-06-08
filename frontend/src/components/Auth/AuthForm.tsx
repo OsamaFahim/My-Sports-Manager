@@ -1,7 +1,6 @@
 // components/auth/AuthForm.tsx
 import React, { useState } from 'react';
 import styles from '../MainPage/MainPage.module.css';
-import { FaGoogle, FaFacebookF } from 'react-icons/fa';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import { signup, login } from '../../services/authService';
@@ -25,12 +24,11 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
     setFormData(prev => ({ ...prev, [id]: value }));
     setFormErrors(prev => ({ ...prev, [id]: ''}));
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     let isValid: boolean;
-    let errors: any;
+    let errors: Partial<Record<keyof SignupFormValues, string>>;
 
     if (!isLogin) {
       //Use signup Validations
@@ -59,8 +57,11 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
         });
         setAuthenticated(true, result.token); 
         alert('Signup successful!');
-      } catch (error: any) {
-        alert(error.response?.data?.message || 'Signup failed');
+      } catch (error: unknown) {
+        const errorMessage = error && typeof error === 'object' && 'response' in error 
+          ? (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Signup failed'
+          : 'Signup failed';
+        alert(errorMessage);
       }
     } else {
       try {
@@ -71,8 +72,11 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
         });
         setAuthenticated(true, result.token);
         alert('Login successful'); 
-      } catch (error: any) {
-        alert(error.response?.data?.message || 'Login failed');
+      } catch (error: unknown) {
+        const errorMessage = error && typeof error === 'object' && 'response' in error 
+          ? (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Login failed'
+          : 'Login failed';
+        alert(errorMessage);
       }
     }
   };
@@ -103,27 +107,12 @@ const AuthForm: React.FC<{ defaultIsLogin?: boolean }> = ({ defaultIsLogin = tru
         {isLogin
           ? 'Sign in to manage your sports teams and events'
           : 'Join Sportify to start managing your sports organization'}
-      </p>
-
-      {/*Forms*/}
+      </p>      {/*Forms*/}
       {isLogin ? (
         <LoginForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
       ) : (   
         <SignupForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} formErrors = {formErrors}/>
       )}
-
-      <div className={styles.divider}>or</div>
-
-      <div className={styles.socialLogin}>
-        <button className={styles.socialButton} type="button">
-          <FaGoogle className={styles.socialIcon} />
-          Google
-        </button>
-        <button className={styles.socialButton} type="button">
-          <FaFacebookF className={styles.socialIcon} />
-          Facebook
-        </button>
-      </div>
 
       <div className={styles.authSwitch}>
         {isLogin ? "Don't have an account? " : 'Already have an account? '}
