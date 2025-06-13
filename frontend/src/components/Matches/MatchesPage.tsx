@@ -58,5 +58,5 @@ const MatchesPage: React.FC = () => {
     </div>
   );
 };
-
+  
 export default MatchesPage;

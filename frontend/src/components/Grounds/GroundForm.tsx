@@ -5,6 +5,7 @@ import { useGrounds } from '../../contexts/GroundContext';
 interface GroundFormProps {
   editingGroundId: string | null;
   setEditingGroundId: (id: string | null) => void;
+  onGroundChanged?: () => Promise<void>;
 }
 
 const GroundForm: React.FC<GroundFormProps> = ({ editingGroundId, setEditingGroundId }) => {

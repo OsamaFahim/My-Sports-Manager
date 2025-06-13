@@ -1,56 +1,94 @@
-.container {
-  max-width: 600px;
-  margin: 2rem auto;
-  background: #161b22;
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 4px 24px rgba(0,230,118,0.08);
+.mainContainer {
+  min-height: 100vh;
+  background: #181c23;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2.5rem;
+}
+
+.headerCard {
+  background: #23272f;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.25);
+  padding: 2.5rem 3rem 1.5rem 3rem;
+  margin-bottom: 2.5rem;
+  width: 90%;
+  max-width: 900px;
+  text-align: center;
 }
 
 .title {
-  color: #00e676;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
+  color: #19ff90;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+}
+
+.subtitle {
+  color: #b9eaff;
+  font-size: 1.15rem;
+  margin-bottom: 0;
+  opacity: 0.8;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+}
+
+.listContainer {
+  width: 90%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.unseen {
-  background: #181f23;
-  border-left: 4px solid #00e676;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  padding: 1rem;
-  transition: background 0.2s;
-}
-
-.seen {
-  background: #181f23;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  padding: 1rem;
-  opacity: 0.7;
+.notificationCard {
+  background: #23272f;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18);
+  padding: 1.5rem 2rem;
+  color: #fff;
+  font-size: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 80px;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }
 
 .message {
-  font-size: 1.1rem;
-  color: #e6edf3;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.7rem;
+  font-weight: 600;
+  color: #19ff90; /* Neon green like ground title */
+  font-size: 1.25rem;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }
 
 .date {
-  font-size: 0.9rem;
-  color: #8b949e;
   text-align: right;
+  color: #7de7b6;
+  font-size: 1rem;
+  opacity: 0.8;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }
 
 .empty {
-  color: #8b949e;
+  color: #b9eaff;
+  background: #23272f;
+  border-radius: 1.2rem;
+  padding: 2rem 2.5rem;
   text-align: center;
+  font-size: 1.2rem;
   margin-top: 2rem;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }

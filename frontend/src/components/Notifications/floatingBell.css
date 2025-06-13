@@ -1,6 +1,6 @@
 .floatingNotificationBell {
   position: fixed;
-  top: 110px;      
+  top: 140px;      
   right: 25px;    
   z-index: 2001;
 }

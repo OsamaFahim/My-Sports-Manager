@@ -2,6 +2,7 @@ import Order, { IOrder } from '../models/Order';
 import Product from '../models/Product';
 import Match from '../models/Match';
 import { createHttpError } from '../utils/createHttpError';
+import { addNotification } from './notificationService'; //Used for sending notifications
 
 export interface CreateOrderData {
   userId?: string;
@@ -113,6 +114,34 @@ export const createOrder = async (orderData: CreateOrderData): Promise<IOrder> =
       }
     }
 
+    //Sedning Notification to the seller
+    const sellerUsernames = [
+      ...new Set(orderItems.map(item => item.seller))
+    ]
+
+    //Compose notification message
+    const productLines = orderItems.map(
+      item => `- ${item.productName} (x${item.quantity})`
+    ).join('\n');
+
+    const buyerEmail = orderData.isGuestOrder
+          ? orderData.guestUser?.email
+          : 'Registered User';
+
+    const buyerPhone = orderData.isGuestOrder
+      ? orderData.guestUser?.mobile
+      : 'Registered User';
+    
+    const notificationMessage =
+      `You have received a new order (#${savedOrder.orderNumber}) for your product(s):\n\n` +
+      `Buyer Email: ${buyerEmail}\n` +
+      `Buyer Phone: ${buyerPhone}\n` +
+      `Products:\n${productLines}`;
+
+    if (sellerUsernames.length > 0) {
+      await addNotification(notificationMessage, sellerUsernames);
+    }
+    
     return savedOrder;
   } catch (error) {
     console.error('Error creating order:', error);
