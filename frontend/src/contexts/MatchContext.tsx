@@ -18,6 +18,7 @@ interface MatchContextType {
   addMatch: (match: { teamA: string; teamB: string; ground: string; date: string; time: string }) => Promise<void>;
   updateMatch: (id: string, match: { teamA: string; teamB: string; ground: string; date: string; time: string }) => Promise<void>;
   deleteMatch: (id: string) => Promise<void>;
+  isPublicView: boolean; 
 }
 
 const MatchContext = createContext<MatchContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { isAuthenticated } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isPublicView, setIsPublicView] = useState(false); 
   const [error, setError] = useState<string | null>(null);
 
   const fetchMatches = async () => {
@@ -34,9 +36,23 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const data = await matchService.getMatches();
       setMatches(Array.isArray(data) ? data : []);
+      setIsPublicView(false); 
     } catch (err: any) {
       setMatches([]);
       setError(err?.response?.data?.message || 'Failed to fetch matches');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllMatches = async () => {
+    setLoading(true);
+    try {
+      const data = await matchService.getAllMatches();
+      setMatches(data);
+      setIsPublicView(true);
+    } catch {
+      setMatches([]);
     } finally {
       setLoading(false);
     }
@@ -46,8 +62,7 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (isAuthenticated) {
       fetchMatches();
     } else {
-      setMatches([]);
-      setLoading(false);
+      fetchAllMatches();
     }
   }, [isAuthenticated]);
 
@@ -62,7 +77,11 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ground: match.ground,
         datetime,
       });
-      await fetchMatches();
+      if (isAuthenticated) { 
+        await fetchMatches();
+      } else {
+        await fetchAllMatches(); 
+      }
     } catch (err: any) {
       throw err; // <-- propagate error so MatchForm can display it
     } finally {
@@ -81,7 +100,11 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ground: match.ground,
         datetime,
       });
-      await fetchMatches();
+      if (isAuthenticated) {
+        await fetchMatches();
+      } else {
+        await fetchAllMatches();
+      }
     } catch (err: any) {
       throw err;
     } finally {
@@ -94,7 +117,11 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setError(null);
     try {
       await matchService.deleteMatch(id);
-      await fetchMatches();
+      if (isAuthenticated) {
+        await fetchMatches();
+      } else {
+        await fetchAllMatches();
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to delete match');
     } finally {
@@ -103,7 +130,7 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <MatchContext.Provider value={{ matches, loading, error, fetchMatches, addMatch, updateMatch, deleteMatch }}>
+    <MatchContext.Provider value={{ matches, loading, error, fetchMatches, addMatch, updateMatch, deleteMatch, isPublicView }}>
       {children}
     </MatchContext.Provider>
   );

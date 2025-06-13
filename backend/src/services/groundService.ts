@@ -1,5 +1,10 @@
 import Ground from '../models/Ground';
 
+
+export async function getAllGrounds() {
+  return Ground.find().lean();
+}
+
 export async function getGroundsByUsername(username: string) {
   return Ground.find({ username }).lean();
 }

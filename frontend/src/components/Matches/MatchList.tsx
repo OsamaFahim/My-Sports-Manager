@@ -7,7 +7,7 @@ interface MatchListProps {
 }
 
 const MatchList: React.FC<MatchListProps> = ({ setEditingMatchId }) => {
-  const { matches, deleteMatch } = useMatches();
+  const { matches, deleteMatch, isPublicView } = useMatches();
   if (matches.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -33,18 +33,29 @@ const MatchList: React.FC<MatchListProps> = ({ setEditingMatchId }) => {
                 {match.teamA} vs {match.teamB}
               </h3>
               <div className={styles.listItemActions}>
-                <button
-                  className={`${styles.actionButton} ${styles.editButton}`}
-                  onClick={() => setEditingMatchId(match._id!)}
-                >
-                  ✏️ Edit
-                </button>
-                <button
-                  className={`${styles.actionButton} ${styles.deleteButton}`}
-                  onClick={() => deleteMatch(match._id!)}
-                >
-                  🗑️ Delete
-                </button>
+                {!isPublicView ? (
+                  <>
+                    <button
+                      className={`${styles.actionButton} ${styles.editButton}`}
+                      onClick={() => setEditingMatchId(match._id!)}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className={`${styles.actionButton} ${styles.deleteButton}`}
+                      onClick={() => deleteMatch(match._id!)}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className={`${styles.actionButton} ${styles.buyTicketButton}`}
+                    // onClick={() => ...} // Add ticket logic later
+                  >
+                    🎟️ Buy Ticket
+                  </button>
+                )}
               </div>
             </div>
             <div className={styles.listItemInfo}>

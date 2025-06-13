@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import * as teamService from '../services/teamService';
 
+//Public Functions
+export async function getAllTeams(req: Request, res: Response) {
+  const teams = await teamService.getAllTeams();
+  res.json(teams);
+}
+
+//Protected Functons
 export async function getTeams(req: Request, res: Response) {
   const username = (req as any).user?.username;
   if (!username) return res.status(401).json({ message: 'Unauthorized' });

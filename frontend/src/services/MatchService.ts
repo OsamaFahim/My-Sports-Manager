@@ -7,6 +7,12 @@ export async function getMatches(): Promise<Match[]> {
   return res.data;
 }
 
+// Get all matches (public route)
+export async function getAllMatches() {
+  const res = await api.get('/matches/all');
+  return res.data;
+}
+
 // Create a new match
 export async function createMatch(match: Omit<Match, '_id'>) {
   const res = await api.post('/matches', match);

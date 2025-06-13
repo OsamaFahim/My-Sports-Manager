@@ -23,6 +23,7 @@ interface TeamContextType {
   addTeam: (team: Omit<Team, '_id'>) => Promise<void>;
   updateTeam: (id: string, team: Partial<Team>) => Promise<void>;
   deleteTeam: (id: string) => Promise<void>;
+  isPublicView: boolean;
 }
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
@@ -30,6 +31,7 @@ const TeamContext = createContext<TeamContextType | undefined>(undefined);
 export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPublicView, setIsPublicView] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const fetchTeams = async () => {
@@ -37,8 +39,21 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const data = await teamService.getTeams();
       setTeams(data);
-    } catch (err) {
-      console.error('Error fetching teams:', err);
+      setIsPublicView(false);
+    } catch {
+      setTeams([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllTeams = async () => {
+    setLoading(true);
+    try {
+      const data = await teamService.getAllTeams();
+      setTeams(data);
+      setIsPublicView(true);
+    } catch {
       setTeams([]);
     } finally {
       setLoading(false);
@@ -49,40 +64,37 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isAuthenticated) {
       fetchTeams();
     } else {
-      setTeams([]);
-      setLoading(false);
+      fetchAllTeams();
     }
   }, [isAuthenticated]);
 
   const addTeam = async (team: Omit<Team, '_id'>) => {
-    try {
-      await teamService.createTeam(team);
-      await fetchTeams();
-    } catch (error: any) {
-      console.error('Error creating team:', error?.response?.data?.message || error.message);
-    }
+    await teamService.createTeam(team);
+    await fetchTeams();
   };
 
   const updateTeam = async (id: string, team: Partial<Team>) => {
-    try {
-      await teamService.updateTeam(id, team);
-      await fetchTeams();
-    } catch (error: any) {
-      console.error('Error updating team:', error?.response?.data?.message || error.message);
-    }
+    await teamService.updateTeam(id, team);
+    await fetchTeams();
   };
 
   const deleteTeam = async (id: string) => {
-    try {
-      await teamService.deleteTeam(id);
-      await fetchTeams();
-    } catch (error: any) {
-      console.error('Error deleting team:', error?.response?.data?.message || error.message);
-    }
+    await teamService.deleteTeam(id);
+    await fetchTeams();
   };
 
   return (
-    <TeamContext.Provider value={{ teams, loading, fetchTeams, addTeam, updateTeam, deleteTeam }}>
+    <TeamContext.Provider
+      value={{
+        teams,
+        loading,
+        fetchTeams,
+        addTeam,
+        updateTeam,
+        deleteTeam,
+        isPublicView,
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );

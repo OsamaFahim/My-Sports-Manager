@@ -6,6 +6,11 @@ export async function getTeams(): Promise<Team[]> {
   return res.data;
 }
 
+export async function getAllTeams(): Promise<Team[]> {
+  const res = await api.get('/teams/all');
+  return res.data;
+}
+
 export async function createTeam(team: Omit<Team, '_id'>) {
   const res = await api.post('/teams', team);
   return res.data;
