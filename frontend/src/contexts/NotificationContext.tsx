@@ -20,17 +20,22 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authLoading } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const data = await notificationService.getNotifications();
+      let data: Notification[] = [];
+      if (isAuthenticated) {
+        data = await notificationService.getNotifications();
+      } else {
+        data = []; 
+      }
       setNotifications(data);
-    } catch (e) {
-      // handle error
+    } catch {
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -46,11 +51,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-         fetchNotifications();
-    }
-  }, [isAuthenticated]);
+   useEffect(() => {
+    if (authLoading) return;
+    fetchNotifications();
+  }, [isAuthenticated, authLoading]);
 
   return (
     <NotificationContext.Provider

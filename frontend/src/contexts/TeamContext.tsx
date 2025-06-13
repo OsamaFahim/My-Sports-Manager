@@ -32,7 +32,7 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPublicView, setIsPublicView] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authLoading } = useAuth();
 
   const fetchTeams = async () => {
     setLoading(true);
@@ -47,26 +47,28 @@ export const TeamProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const fetchAllTeams = async () => {
-    setLoading(true);
-    try {
-      const data = await teamService.getAllTeams();
-      setTeams(data);
-      setIsPublicView(true);
-    } catch {
-      setTeams([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchTeams();
-    } else {
-      fetchAllTeams();
-    }
-  }, [isAuthenticated]);
+    if (authLoading) return; // Wait for auth to finish loading
+    setLoading(true);
+    const fetch = async () => {
+      try {
+        if (isAuthenticated) {
+          const data = await teamService.getTeams();
+          setTeams(data);
+          setIsPublicView(false);
+        } else {
+          const data = await teamService.getAllTeams();
+          setTeams(data);
+          setIsPublicView(true);
+        }
+      } catch {
+        setTeams([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [isAuthenticated, authLoading]);
 
   const addTeam = async (team: Omit<Team, '_id'>) => {
     await teamService.createTeam(team);
