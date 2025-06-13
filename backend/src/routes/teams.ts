@@ -4,6 +4,9 @@ import * as teamController from '../controllers/teamController';
 
 const router = express.Router();
 
+//Public routes can be accessed without authentication (get all teams)
+router.get('/all', teamController.getAllTeams);
+
 //These are protected routes, so we need to authenticate the user first
 //and protected routes are only accessible to authenticated users,
 //protected routes use authenticateJWT middleware

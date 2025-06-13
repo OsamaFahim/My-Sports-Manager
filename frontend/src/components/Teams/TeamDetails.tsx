@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Team, Player } from '../../contexts/TeamContext';
+import { Team, Player, useTeams } from '../../contexts/TeamContext';
 import PlayerList from './PlayerList';
 import PlayerForm from './PlayerForm';
 import styles from '../Management/ManagementPages.module.css';
@@ -7,6 +7,7 @@ import styles from '../Management/ManagementPages.module.css';
 const TeamDetails: React.FC<{ team: Team; close: () => void }> = ({ team, close }) => {
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+  const { isPublicView } = useTeams();
 
   const handleEditPlayer = (player: Player) => {
     setEditingPlayer(player);
@@ -17,6 +18,7 @@ const TeamDetails: React.FC<{ team: Team; close: () => void }> = ({ team, close 
     setEditingPlayer(null);
     setShowPlayerForm(false);
   };
+
   return (
     <div className={styles.detailsContainer}>
       <div className={styles.detailsHeader}>
@@ -32,26 +34,30 @@ const TeamDetails: React.FC<{ team: Team; close: () => void }> = ({ team, close 
       <div className={styles.detailsContent}>
         <PlayerList team={team} onEditPlayer={handleEditPlayer} />
         
-        <div className={styles.detailsActions}>
-          <button
-            className={styles.actionButton}
-            onClick={() => {
-              setEditingPlayer(null);
-              setShowPlayerForm(v => !v);
-            }}
-          >
-            {showPlayerForm && !editingPlayer ? '📋 Hide Player Form' : '➕ Add Player'}
-          </button>
-        </div>
-        
-        {showPlayerForm && (
-          <div className={styles.formSection}>
-            <PlayerForm
-              teamId={team._id!}
-              onDone={handleDone}
-              editingPlayer={editingPlayer}
-            />
-          </div>
+        {/* Only show add/hide player button and form for logged-in users */}
+        {!isPublicView && (
+          <>
+            <div className={styles.detailsActions}>
+              <button
+                className={styles.actionButton}
+                onClick={() => {
+                  setEditingPlayer(null);
+                  setShowPlayerForm(v => !v);
+                }}
+              >
+                {showPlayerForm && !editingPlayer ? '📋 Hide Player Form' : '➕ Add Player'}
+              </button>
+            </div>
+            {showPlayerForm && (
+              <div className={styles.formSection}>
+                <PlayerForm
+                  teamId={team._id!}
+                  onDone={handleDone}
+                  editingPlayer={editingPlayer}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

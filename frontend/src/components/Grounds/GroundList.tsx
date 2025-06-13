@@ -7,14 +7,16 @@ interface GroundListProps {
 }
 
 const GroundList: React.FC<GroundListProps> = ({ setEditingGroundId }) => {
-  const { grounds, deleteGround } = useGrounds();
+  const { grounds, deleteGround, isPublicView } = useGrounds();
   if (grounds.length === 0) {
     return (
       <div className={styles.emptyState}>
         <div className={styles.emptyIcon}>🏟️</div>
         <h3 className={styles.emptyTitle}>No Grounds Added</h3>
         <p className={styles.emptyDescription}>
-          Add your first ground to start scheduling matches and events.
+          {isPublicView
+            ? 'No grounds have been registered yet. Check back soon!'
+            : 'Add your first ground to start scheduling matches and events.'}
         </p>
       </div>
     );
@@ -26,20 +28,22 @@ const GroundList: React.FC<GroundListProps> = ({ setEditingGroundId }) => {
         <div key={ground._id} className={styles.listItem}>
           <div className={styles.listItemHeader}>
             <h3 className={styles.listItemTitle}>{ground.name}</h3>
-            <div className={styles.listItemActions}>
-              <button
-                className={`${styles.actionButton} ${styles.editButton}`}
-                onClick={() => setEditingGroundId(ground._id!)}
-              >
-                ✏️ Edit
-              </button>
-              <button
-                className={`${styles.actionButton} ${styles.deleteButton}`}
-                onClick={() => deleteGround(ground._id!)}
-              >
-                🗑️ Delete
-              </button>
-            </div>
+            {!isPublicView && (
+              <div className={styles.listItemActions}>
+                <button
+                  className={`${styles.actionButton} ${styles.editButton}`}
+                  onClick={() => setEditingGroundId(ground._id!)}
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  className={`${styles.actionButton} ${styles.deleteButton}`}
+                  onClick={() => deleteGround(ground._id!)}
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            )}
           </div>
           <div className={styles.listItemInfo}>
             <p><strong>📍 Location:</strong> {ground.location}</p>

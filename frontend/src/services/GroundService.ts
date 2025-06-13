@@ -6,6 +6,12 @@ export async function getGrounds(): Promise<Ground[]> {
   return res.data;
 }
 
+//This route is public and can be accessed without authentication
+export async function getAllGrounds() {
+  const res = await api.get('/grounds/all');
+  return res.data;
+}
+
 export async function createGround(ground: Omit<Ground, '_id'>) {
   const res = await api.post('/grounds', ground);
   return res.data;

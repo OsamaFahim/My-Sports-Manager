@@ -593,6 +593,27 @@
   background: rgba(0, 230, 118, 0.5);
 }
 
+.buyTicketButton {
+  background: linear-gradient(135deg, #00e676 0%, #00c853 100%);
+  color: #0d1117;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.buyTicketButton:hover {
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
+  transform: translateY(-2px);
+}
+
 /* Animations */
 @keyframes fadeInUp {
   from {

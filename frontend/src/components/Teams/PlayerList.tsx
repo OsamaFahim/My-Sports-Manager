@@ -1,8 +1,6 @@
 import React from 'react';
-import { Team, Player } from '../../contexts/TeamContext';
+import { Team, Player, useTeams } from '../../contexts/TeamContext';
 import styles from '../Management/ManagementPages.module.css';
-import { deletePlayer } from '../../services/TeamService';
-import { useTeams } from '../../contexts/TeamContext';
 
 interface PlayerListProps {
   team: Team;
@@ -10,14 +8,8 @@ interface PlayerListProps {
 }
 
 const PlayerList: React.FC<PlayerListProps> = ({ team, onEditPlayer }) => {
-  const { fetchTeams } = useTeams();
+  const { isPublicView } = useTeams();
 
-  const handleDelete = async (playerId: string) => {
-    if (window.confirm('Are you sure you want to delete this player?')) {
-      await deletePlayer(team._id!, playerId);
-      await fetchTeams();
-    }
-  };
   return (
     <div className={styles.playersList}>
       {team.players.length === 0 && (
@@ -35,20 +27,17 @@ const PlayerList: React.FC<PlayerListProps> = ({ team, onEditPlayer }) => {
               Age: {player.age} | Position: {player.position} | Stats: {player.stats}
             </div>
           </div>
-          <div className={styles.listItemActions}>
-            <button
-              className={`${styles.actionButton} ${styles.editButton}`}
-              onClick={() => onEditPlayer && onEditPlayer(player)}
-            >
-              ✏️ Edit
-            </button>
-            <button
-              className={`${styles.actionButton} ${styles.deleteButton}`}
-              onClick={() => handleDelete(player._id!)}
-            >
-              🗑️ Delete
-            </button>
-          </div>
+          {!isPublicView && onEditPlayer && (
+            <div className={styles.listItemActions}>
+              <button
+                className={`${styles.actionButton} ${styles.editButton}`}
+                onClick={() => onEditPlayer(player)}
+              >
+                ✏️ Edit
+              </button>
+              {/* Add delete button if needed */}
+            </div>
+          )}
         </div>
       ))}
     </div>

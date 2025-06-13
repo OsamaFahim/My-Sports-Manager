@@ -52,25 +52,19 @@ const App: React.FC = () => {
                         <Route
                           path="/teams"
                           element={
-                            <ProtectedRoute resourceName="teams">
-                              <TeamsPage />
-                            </ProtectedRoute>
+                            <TeamsPage />
                           }
                         />
                         <Route
                           path="/matches"
                           element={
-                            <ProtectedRoute resourceName="matches">
                               <MatchesPage />
-                            </ProtectedRoute>
                           }
                         />
                         <Route
                           path="/grounds"
                           element={
-                            <ProtectedRoute resourceName="grounds">
                               <GroundsPage />
-                            </ProtectedRoute>
                           }
                         />                        <Route
                           path="/notifications"

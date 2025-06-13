@@ -6,6 +6,7 @@ import { errorHandler } from './middlewares/ErrorHandlerMiddleware';
 
 // Importing services
 import OrderStatusService from './services/orderStatusService';
+import './schedulers/matchCleanupScheduler';
 
 // Importing routes
 import authRoutes from './routes/auth';   // 👈 import Auth Routes

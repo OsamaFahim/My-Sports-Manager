@@ -1,5 +1,11 @@
 import Team from '../models/Team';
 
+// These services functions are for anonymous and logged out users
+export async function getAllTeams() {
+  return Team.find().lean();
+}
+
+// These services functions are for logged in users only
 export async function getTeamsByUsername(username: string) {
   return Team.find({ username }).lean();
 }

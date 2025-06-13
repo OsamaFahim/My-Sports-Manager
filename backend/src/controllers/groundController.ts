@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import * as groundService from '../services/groundService';
 
+//Functions for logged out users
+export async function getAllGrounds(req: Request, res: Response) {
+  const grounds = await groundService.getAllGrounds();
+  res.json(grounds);
+}
+
+//Functions for Logged in users
 export async function getGrounds(req: Request, res: Response) {
   const username = (req as any).user?.username;
   if (!username) return res.status(401).json({ message: 'Unauthorized' });

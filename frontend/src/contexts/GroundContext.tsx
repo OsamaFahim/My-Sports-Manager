@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as groundService from '../services/GroundService';
 import { useAuth } from './AuthContext';
 
@@ -13,91 +13,89 @@ export interface Ground {
 interface GroundContextType {
   grounds: Ground[];
   loading: boolean;
-  error: string | null;
   fetchGrounds: () => Promise<void>;
   addGround: (ground: Omit<Ground, '_id'>) => Promise<void>;
   updateGround: (id: string, ground: Partial<Ground>) => Promise<void>;
   deleteGround: (id: string) => Promise<void>;
+  isPublicView: boolean;
 }
 
 const GroundContext = createContext<GroundContextType | undefined>(undefined);
 
 export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
   const [grounds, setGrounds] = useState<Ground[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isPublicView, setIsPublicView] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const fetchGrounds = async () => {
     setLoading(true);
-    setError(null);
     try {
       const data = await groundService.getGrounds();
-      setGrounds(Array.isArray(data) ? data : []);
-    } catch (err: any) {
+      setGrounds(data);
+      setIsPublicView(false); // <-- THIS IS CRUCIAL
+    } catch {
       setGrounds([]);
-      setError(err?.response?.data?.message || 'Failed to fetch grounds');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const fetchAllGrounds = async () => {
+    setLoading(true);
+    try {
+      const data = await groundService.getAllGrounds();
+      setGrounds(data);
+      setIsPublicView(true); // <-- THIS IS CRUCIAL
+    } catch {
+      setGrounds([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchGrounds();
     } else {
-      setGrounds([]);
-      setLoading(false);
+      fetchAllGrounds();
     }
   }, [isAuthenticated]);
 
   const addGround = async (ground: Omit<Ground, '_id'>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await groundService.createGround(ground);
-      await fetchGrounds();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to add ground');
-    } finally {
-      setLoading(false);
-    }
+    await groundService.createGround(ground);
+    await fetchGrounds();
   };
 
   const updateGround = async (id: string, ground: Partial<Ground>) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await groundService.updateGround(id, ground);
-      await fetchGrounds();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to update ground');
-    } finally {
-      setLoading(false);
-    }
+    await groundService.updateGround(id, ground);
+    await fetchGrounds();
   };
 
   const deleteGround = async (id: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await groundService.deleteGround(id);
-      await fetchGrounds();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to delete ground');
-    } finally {
-      setLoading(false);
-    }
+    await groundService.deleteGround(id);
+    await fetchGrounds();
   };
 
   return (
-    <GroundContext.Provider value={{ grounds, loading, error, fetchGrounds, addGround, updateGround, deleteGround }}>
+    <GroundContext.Provider
+      value={{
+        grounds,
+        loading,
+        fetchGrounds,
+        addGround,
+        updateGround,
+        deleteGround,
+        isPublicView,
+      }}
+    >
       {children}
     </GroundContext.Provider>
   );
 };
 
-export function useGrounds() {
+export const useGrounds = () => {
   const ctx = useContext(GroundContext);
   if (!ctx) throw new Error('useGrounds must be used within GroundProvider');
   return ctx;
-}
+};

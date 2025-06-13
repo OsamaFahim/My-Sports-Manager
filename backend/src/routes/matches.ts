@@ -4,8 +4,10 @@ import * as matchController from '../controllers/matchController';
 
 const router = express.Router();
 
-router.use(authenticateJWT);
+// Public route to get all matches
+router.get('/all', wrap(matchController.getAllMatches));
 
+router.use(authenticateJWT);
 
 // Helper to wrap async controllers and forward errors
 function wrap(fn: any) {

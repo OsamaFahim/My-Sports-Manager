@@ -1,5 +1,9 @@
 import Match, { IMatch } from '../models/Match';
 
+export async function getAllMatches(): Promise<IMatch[]> {
+  return Match.find().lean(); 
+}
+
 export async function getMatchesByUsername(username: string): Promise<IMatch[]> {
   return Match.find({ username });
 }

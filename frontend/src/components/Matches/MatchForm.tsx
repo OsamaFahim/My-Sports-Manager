@@ -26,7 +26,7 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
     date: '',
     time: '',
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof MatchFormValues, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof MatchFormValues | 'time' | 'ground', string>>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const isEditing = Boolean(editingMatchId);
@@ -64,7 +64,8 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
     setErrors(validation.errors);
     setSubmitError(null);
 
-    if (!validation.isValid) return;    try {
+    if (!validation.isValid) return;
+    try {
       if (isEditing && editingMatchId) {
         await updateMatch(editingMatchId, form);
         setEditingMatchId(null);
@@ -74,13 +75,25 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
       setForm({ teamA: '', teamB: '', ground: '', date: '', time: '' });
       setSubmitError(null); // Clear error on success
     } catch (err: unknown) {
-      const errorMessage = 
-        (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
-        (err as { message?: string })?.message ||
-        'Failed to save match. Please try again.';
-      setSubmitError(errorMessage);
+      // --- Updated error handling for backend field errors ---
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'response' in err &&
+        (err as any).response?.data?.errors
+      ) {
+        setErrors((err as any).response.data.errors);
+        setSubmitError(null);
+      } else {
+        const errorMessage =
+          (err as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message ||
+          (err as { message?: string })?.message ||
+          'Failed to save match. Please try again.';
+        setSubmitError(errorMessage);
+      }
     }
   };
+
   if (!grounds || grounds.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -127,7 +140,8 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
           onChange={handleChange}
           required
           className={styles.select}
-        >        <option value="">Select Team B</option>
+        >
+          <option value="">Select Team B</option>
           {teams.map(team => (
             <option key={team._id} value={team.name}>
               {team.name}
@@ -183,7 +197,9 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
           value={form.time}
           onChange={handleChange}
           required
-          className={styles.input}        />
+          className={styles.input}
+        />
+        {/* Show backend or frontend time error below Time field */}
         {errors.time && <div className={styles.errorMessage}>{errors.time}</div>}
       </div>
       <div className={styles.buttonGroup}>
@@ -200,6 +216,7 @@ const MatchForm: React.FC<MatchFormProps> = ({ editingMatchId, setEditingMatchId
           </button>
         )}
       </div>
+      {/* Show general submit error below the button group */}
       {submitError && <div className={styles.errorMessage}>{submitError}</div>}
     </form>
   );
