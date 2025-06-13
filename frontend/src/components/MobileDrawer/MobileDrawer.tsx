@@ -1,124 +1,74 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import styles from './MobileDrawer.module.css';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface MobileDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onAuthAction?: (action: 'login' | 'signup') => void;
+  onAuthAction?: (action: 'none' | 'login' | 'signup') => void;
 }
 
 const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose, onAuthAction }) => {
   const { pathname } = useLocation();
-  const { isAuthenticated, username, logout } = useAuth();
-
-  const navigationItems = [
-    { path: '/', label: 'Home' },
-    { path: '/teams', label: 'Teams' },
-    { path: '/matches', label: 'Matches' },
-    { path: '/grounds', label: 'Grounds' },
-    { path: '/Discussions', label: 'Discussions' },
-    { path: '/products', label: 'Products' },
-    { path: '/shop', label: 'Shop' },
-    { path: '/tracking', label: 'Track Order' },
-    { path: '/financial-statistics', label: 'Financial Reports' },
-  ];
-
-  const handleLinkClick = () => {
-    onClose();
-  };
-
-  const handleAuthAction = (action: 'login' | 'signup') => {
-    onAuthAction?.(action);
-    onClose();
-  };
-
-  const handleLogout = () => {
-    logout();
-    onClose();
-  };
+  const { isAuthenticated } = useAuth();
 
   return (
-    <>
-      {/* Overlay */}
-      <div 
-        className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ''}`}
-        onClick={onClose}
-      />
-      
-      {/* Drawer */}
-      <div className={`${styles.drawer} ${isOpen ? styles.drawerOpen : ''}`}>
-        {/* Header */}
-        <div className={styles.drawerHeader}>
-          <h2 className={styles.drawerTitle}>Sportify</h2>
-          <button 
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label="Close menu"
-          >
-            <span className={styles.closeIcon}>×</span>
-          </button>
-        </div>
-
-        {/* User Section */}
+    <div className={`${styles.drawer} ${isOpen ? styles.open : ''}`}>
+      <button className={styles.closeButton} onClick={onClose}>×</button>
+      <ul className={styles.navLinks}>
+        <li>
+          <Link to="/" className={pathname === '/' ? styles.active : undefined} onClick={onClose}>
+            Home
+          </Link>
+        </li>
+        <li>
+          <Link to="/teams" className={pathname === '/teams' ? styles.active : undefined} onClick={onClose}>
+            Teams
+          </Link>
+        </li>
+        <li>
+          <Link to="/matches" className={pathname === '/matches' ? styles.active : undefined} onClick={onClose}>
+            Matches
+          </Link>
+        </li>
+        <li>
+          <Link to="/grounds" className={pathname === '/grounds' ? styles.active : undefined} onClick={onClose}>
+            Grounds
+          </Link>
+        </li>
+        <li>
+          <Link to="/discussions" className={pathname === '/discussions' ? styles.active : undefined} onClick={onClose}>
+            Discussions
+          </Link>
+        </li>
+        <li>
+          <Link to="/shop" className={pathname === '/shop' ? styles.active : undefined} onClick={onClose}>
+            Shop
+          </Link>
+        </li>
+        <li>
+          <Link to="/tracking" className={pathname === '/tracking' ? styles.active : undefined} onClick={onClose}>
+            Tracking
+          </Link>
+        </li>
+        {/* Only show these links if authenticated */}
         {isAuthenticated && (
-          <div className={styles.userSection}>
-            <div className={styles.welcomeMessage}>
-              Welcome{username ? `, ${username}` : ''}!
-            </div>
-          </div>
+          <>
+            <li>
+              <Link to="/products" className={pathname === '/products' ? styles.active : undefined} onClick={onClose}>
+                Products
+              </Link>
+            </li>
+            <li>
+              <Link to="/financial-statistics" className={pathname === '/financial-statistics' ? styles.active : undefined} onClick={onClose}>
+                Financial Reports
+              </Link>
+            </li>
+          </>
         )}
-
-        {/* Navigation Links */}
-        <nav className={styles.drawerNav}>
-          {navigationItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`${styles.drawerLink} ${pathname === item.path ? styles.drawerLinkActive : ''}`}
-              onClick={handleLinkClick}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Auth Section */}
-        <div className={styles.authSection}>
-          {!isAuthenticated ? (
-            <>
-              {pathname === '/' && (
-                <>
-                  <button
-                    className={`${styles.authButton} ${styles.signupBtn}`}
-                    onClick={() => handleAuthAction('signup')}
-                    type="button"
-                  >
-                    Create Account
-                  </button>
-                  <button
-                    className={`${styles.authButton} ${styles.loginBtn}`}
-                    onClick={() => handleAuthAction('login')}
-                    type="button"
-                  >
-                    Login
-                  </button>
-                </>
-              )}
-            </>
-          ) : (
-            <button
-              className={`${styles.authButton} ${styles.logoutBtn}`}
-              onClick={handleLogout}
-              type="button"
-            >
-              Logout
-            </button>
-          )}
-        </div>
-      </div>
-    </>
+      </ul>
+    </div>
   );
 };
 
