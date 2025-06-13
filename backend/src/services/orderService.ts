@@ -1,9 +1,9 @@
 import Order, { IOrder } from '../models/Order';
 import Product from '../models/Product';
+import Match from '../models/Match';
 import { createHttpError } from '../utils/createHttpError';
 
 export interface CreateOrderData {
-  // User information
   userId?: string;
   guestUser?: {
     email: string;
@@ -12,14 +12,12 @@ export interface CreateOrderData {
     lastName: string;
   };
   isGuestOrder: boolean;
-  
-  // Order items
   items: Array<{
     productId: string;
     quantity: number;
+    category?: string;
+    price: number;
   }>;
-  
-  // Payment information
   paymentInfo: {
     cardholderName: string;
     cardType: string;
@@ -32,41 +30,62 @@ export interface CreateOrderData {
       country: string;
     };
   };
+  orderStatus?: string;
 }
 
 export const createOrder = async (orderData: CreateOrderData): Promise<IOrder> => {
   try {
-    // Validate and fetch product details
     const orderItems = [];
     let subtotal = 0;
 
-    for (const item of orderData.items) {
-      const product = await Product.findById(item.productId);      if (!product) {
-        throw createHttpError(`Product with ID ${item.productId} not found`, 404);
-      }      if (product.quantity < item.quantity) {
-        throw createHttpError(`Insufficient stock for product ${product.name}. Available: ${product.quantity}, Requested: ${item.quantity}`, 400);
-      }
-
-      const itemTotal = product.price * item.quantity;
-      subtotal += itemTotal;
-
-      orderItems.push({
-        productId: product._id,
-        productName: product.name,
-        productImage: product.productImage,
-        price: product.price,
-        quantity: item.quantity,
-        category: product.category,
-        seller: product.username
-      });
+    // Automatically set orderStatus to 'delivered' if all items are tickets
+    const allTickets = orderData.items.every(
+      (item: any) => item.category && item.category === 'ticket'
+    );
+    if (allTickets) {
+      orderData.orderStatus = 'delivered';
     }
 
-    // Calculate totals
+    for (const item of orderData.items) {
+      let productName, category, seller, price, productImage;
+
+      price = item.price; // Use price from frontend
+
+      if (item.category === 'ticket') {
+        // Fetch match info for ticket
+        const match = await Match.findById(item.productId);
+        if (!match) throw new Error('Match not found for ticket order');
+        productName = `${match.teamA} vs ${match.teamB}`;
+        category = 'ticket';
+        seller = match.username ;
+        productImage = ""; // Or set a default image path for tickets if needed
+      } else {
+        // Normal product
+        const product = await Product.findById(item.productId);
+        if (!product) throw new Error('Product not found');
+        productName = product.name;
+        category = product.category;
+        seller = product.username;
+        productImage = (product as any).image || "";
+      }
+
+      orderItems.push({
+        productId: item.productId,
+        productName,
+        productImage,
+        price,
+        quantity: item.quantity,
+        category,
+        seller
+      });
+
+      subtotal += price * item.quantity;
+    }
+
     const shipping = subtotal > 100 ? 0 : 9.99;
-    const tax = subtotal * 0.08; // 8% tax
+    const tax = subtotal * 0.08;
     const total = subtotal + shipping + tax;
 
-    // Create order
     const order = new Order({
       userId: orderData.userId || undefined,
       guestUser: orderData.guestUser || undefined,
@@ -75,20 +94,23 @@ export const createOrder = async (orderData: CreateOrderData): Promise<IOrder> =
       subtotal: Number(subtotal.toFixed(2)),
       shipping: Number(shipping.toFixed(2)),
       tax: Number(tax.toFixed(2)),
-      total: Number(total.toFixed(2)),      paymentInfo: orderData.paymentInfo,
-      paymentStatus: 'completed', // Since we're simulating payment success
-      orderStatus: 'pending'
+      total: Number(total.toFixed(2)),
+      paymentInfo: orderData.paymentInfo,
+      paymentStatus: 'completed',
+      orderStatus: orderData.orderStatus || 'pending'
     });
 
     const savedOrder = await order.save();
 
-    // Update product quantities
+    // Update product quantities only for normal products
     for (const item of orderData.items) {
-      await Product.findByIdAndUpdate(
-        item.productId,
-        { $inc: { quantity: -item.quantity } },
-        { new: true }
-      );
+      if (item.category !== 'ticket') {
+        await Product.findByIdAndUpdate(
+          item.productId,
+          { $inc: { quantity: -item.quantity } },
+          { new: true }
+        );
+      }
     }
 
     return savedOrder;
@@ -101,7 +123,8 @@ export const createOrder = async (orderData: CreateOrderData): Promise<IOrder> =
 export const getOrderById = async (orderId: string): Promise<IOrder | null> => {
   try {
     const order = await Order.findById(orderId).populate('items.productId');
-    return order;  } catch (error) {
+    return order;
+  } catch (error) {
     console.error('Error fetching order:', error);
     throw createHttpError('Error fetching order', 500);
   }
@@ -111,7 +134,8 @@ export const getOrderByOrderNumber = async (orderNumber: string): Promise<IOrder
   try {
     const order = await Order.findOne({ orderNumber }).populate('items.productId');
     return order;
-  } catch (error) {    console.error('Error fetching order by order number:', error);
+  } catch (error) {
+    console.error('Error fetching order by order number:', error);
     throw createHttpError('Error fetching order', 500);
   }
 };
@@ -130,9 +154,9 @@ export const getUserOrders = async (userId: string): Promise<IOrder[]> => {
 
 export const getGuestOrdersByEmail = async (email: string): Promise<IOrder[]> => {
   try {
-    const orders = await Order.find({ 
-      'guestUser.email': email, 
-      isGuestOrder: true 
+    const orders = await Order.find({
+      'guestUser.email': email,
+      isGuestOrder: true
     })
       .sort({ createdAt: -1 })
       .populate('items.productId');
@@ -144,7 +168,8 @@ export const getGuestOrdersByEmail = async (email: string): Promise<IOrder[]> =>
 };
 
 export const updateOrderStatus = async (orderId: string, status: string): Promise<IOrder | null> => {
-  try {    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+  try {
+    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
       throw createHttpError('Invalid order status', 400);
     }
@@ -153,7 +178,8 @@ export const updateOrderStatus = async (orderId: string, status: string): Promis
       orderId,
       { orderStatus: status },
       { new: true }
-    );    if (!order) {
+    );
+    if (!order) {
       throw createHttpError('Order not found', 404);
     }
 
@@ -175,7 +201,8 @@ export const getAllOrders = async (page: number = 1, limit: number = 10): Promis
 
     const total = await Order.countDocuments();
 
-    return { orders, total };  } catch (error) {
+    return { orders, total };
+  } catch (error) {
     console.error('Error fetching all orders:', error);
     throw createHttpError('Error fetching orders', 500);
   }

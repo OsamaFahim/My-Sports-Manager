@@ -1,13 +1,44 @@
 import React from 'react';
 import styles from '../Management/ManagementPages.module.css';
 import { useMatches } from '../../contexts/MatchContext';
+import { useCart } from '../../contexts/CartContext';
+import api from '../../services/api';
 
-interface MatchListProps {
-  setEditingMatchId: (id: string | null) => void;
-}
+const TICKET_PRICE = 500; // Set your ticket price here
 
-const MatchList: React.FC<MatchListProps> = ({ setEditingMatchId }) => {
+const MatchList: React.FC<{ setEditingMatchId: (id: string | null) => void }> = ({ setEditingMatchId }) => {
   const { matches, deleteMatch, isPublicView } = useMatches();
+  const { addToCart } = useCart();
+
+  const handleBuyTicket = async (match: any) => {
+    try {
+      // Check capacity before adding
+      const res = await api.get(`/matches/${match._id}/tickets/availability`);
+      if (!res.data.available) {
+        alert('This match is fully booked!');
+        return;
+      }
+      // Add ticket to cart as a product
+      addToCart({
+        _id: match._id,
+        name: `${match.teamA} vs ${match.teamB}`,
+        price: TICKET_PRICE,
+        category: 'ticket',
+        ground: match.ground,
+        date: new Date(match.datetime).toLocaleDateString(),
+        time: new Date(match.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        description: '',
+        productImage: '',
+        quantity: 1,
+        username: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }, 1);
+    } catch (err) {
+      alert('Could not check ticket availability. Please try again.');
+    }
+  };
+
   if (matches.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -51,7 +82,7 @@ const MatchList: React.FC<MatchListProps> = ({ setEditingMatchId }) => {
                 ) : (
                   <button
                     className={`${styles.actionButton} ${styles.buyTicketButton}`}
-                    // onClick={() => ...} // Add ticket logic later
+                    onClick={() => handleBuyTicket(match)}
                   >
                     🎟️ Buy Ticket
                   </button>

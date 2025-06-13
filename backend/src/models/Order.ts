@@ -77,7 +77,7 @@ const guestUserSchema = new Schema<IGuestUser>({
 const orderItemSchema = new Schema<IOrderItem>({
   productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
   productName: { type: String, required: true },
-  productImage: { type: String, required: true },
+  productImage: { type: String, default: '' }, // Optional, can be empty for tickets
   price: { type: Number, required: true, min: 0 },
   quantity: { type: Number, required: true, min: 1 },
   category: { type: String, required: true },
