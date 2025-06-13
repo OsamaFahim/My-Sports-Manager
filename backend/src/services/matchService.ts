@@ -1,6 +1,8 @@
 import Match, { IMatch } from '../models/Match';
 import Order from '../models/Order';
 import Ground from '../models/Ground';
+import { addNotification } from './notificationService'; 
+
 
 export async function getAllMatches(): Promise<IMatch[]> {
   return Match.find().lean();
@@ -11,7 +13,15 @@ export async function getMatchesByUsername(username: string): Promise<IMatch[]> 
 }
 
 export async function createMatch(username: string, data: any): Promise<IMatch> {
-  return Match.create({ ...data, username });
+  //return Match.create({ ...data, username });
+  const match = await Match.create({ ...data, username });
+
+  await addNotification(
+    `Your match between ${match.teamA} and ${match.teamB} at ${match.ground} on ${new Date(match.datetime).toLocaleString()} has been scheduled successfully.`,
+    [username]
+  );
+
+  return match;
 }
 
 export async function updateMatch(id: string, data: any): Promise<IMatch | null> {

@@ -19,8 +19,6 @@ import productsRoutes from './routes/products'; // 👈 import Products Routes
 import orderRoutes from './routes/orderRoutes'; // 👈 import Order Routes
 import statisticsRoutes from './routes/statistics'; // 👈 import Statistics Routes
 
-
-
 // Importing MongoDB connection
 import { connectToMongo } from './config/db';    // 👈 import MongoDB connection
 
