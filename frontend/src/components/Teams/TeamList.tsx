@@ -58,14 +58,6 @@ const TeamList: React.FC<TeamListProps> = ({ setEditingTeam }) => {
                 </button>
               </div>
             )}
-          {isPublicView && (
-            <button
-              className = {`${styles.actionButton} ${styles.buyTicketButton}`}
-              //onclick={() => ...} // Add functionality for buying tickets if needed
-              >
-                🎟️ Buy Ticket
-              </button>
-          )}
           </div>
           <div className={styles.listItemInfo}>
             <p>Players: {team.players?.length || 0}</p>

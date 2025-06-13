@@ -1,10 +1,14 @@
 /* Checkout Container */
 .checkoutContainer {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: #0d1117;
+  width: 100vw;
   min-height: 100vh;
+  margin: 0;
+  padding: 2rem 0;
+  background: #0d1117;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .checkoutHeader {

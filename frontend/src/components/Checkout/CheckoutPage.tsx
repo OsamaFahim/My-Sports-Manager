@@ -56,24 +56,30 @@ const CheckoutPage: React.FC = () => {
   const handleGuestDetailsSubmit = (details: GuestDetails) => {
     setGuestDetails(details);
     setStep('payment');
-  };  const handlePaymentSuccess = async (paymentData: PaymentData) => {
+  };
+
+  const handlePaymentSuccess = async (paymentData: PaymentData) => {
     setIsProcessing(true);
     setError('');
-    
-    try {      // Prepare order data
+
+    try {
+      // Prepare order data
       const orderData = {
         userId: isAuthenticated && userId ? userId : undefined,
         guestUser: !isAuthenticated ? guestDetails : undefined,
-        isGuestOrder: !isAuthenticated,        items: cartItems.map(item => ({
+        isGuestOrder: !isAuthenticated,
+        items: cartItems.map(item => ({
           productId: item.product._id,
-          quantity: item.quantity
+          quantity: item.quantity,
+          category: item.product.category, // No ternary, just send as is
+          price: item.product.price        // Always include price
         })),
         paymentInfo: paymentData
       };
 
       // Create order via API
       const response = await OrderService.createOrder(orderData);
-      
+
       if (response.success && response.data) {
         setOrderInfo({
           orderNumber: response.data.orderNumber,
@@ -97,6 +103,7 @@ const CheckoutPage: React.FC = () => {
   const handleBackToShopping = () => {
     navigate('/shop');
   };
+
   if (cartItems.length === 0) {
     return null;
   }
@@ -116,7 +123,8 @@ const CheckoutPage: React.FC = () => {
             3. Confirmation
           </div>
         </div>
-      </div>      <div className={styles.checkoutContent}>
+      </div>
+      <div className={styles.checkoutContent}>
         {step === 'details' && !isAuthenticated && (
           <div className={styles.detailsSection}>
             <GuestForm onSubmit={handleGuestDetailsSubmit} />
@@ -129,7 +137,7 @@ const CheckoutPage: React.FC = () => {
             <div className={styles.userDetails}>
               <h2>Your Details</h2>
               <p><strong>Username:</strong> {username}</p>
-              <button 
+              <button
                 className={styles.proceedButton}
                 onClick={() => setStep('payment')}
               >
@@ -151,7 +159,8 @@ const CheckoutPage: React.FC = () => {
             />
             <OrderSummary cartItems={cartItems} total={getTotalPrice()} />
           </div>
-        )}        {step === 'success' && orderInfo && (
+        )}
+        {step === 'success' && orderInfo && (
           <div className={styles.successSection}>
             <div className={styles.successIcon}>✅</div>
             <h2 className={styles.successTitle}>Order Placed Successfully!</h2>
@@ -162,7 +171,7 @@ const CheckoutPage: React.FC = () => {
             <p className={styles.successMessage}>
               Thank you for your purchase. You will receive a confirmation email shortly.
             </p>
-            <button 
+            <button
               className={styles.backToShopButton}
               onClick={handleBackToShopping}
             >
@@ -174,7 +183,7 @@ const CheckoutPage: React.FC = () => {
         {error && (
           <div className={styles.errorMessage}>
             <p>{error}</p>
-            <button 
+            <button
               className={styles.retryButton}
               onClick={() => setError('')}
             >

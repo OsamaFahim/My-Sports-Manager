@@ -1,14 +1,23 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from './ProductContext';
 
+// Extend Product type for ticket support
+export interface TicketProduct extends Product {
+  category: 'ticket';
+  ground: string;
+  date: string;
+  time: string;
+  // No image for tickets
+}
+
 export interface CartItem {
-  product: Product;
+  product: Product | TicketProduct;
   quantity: number;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product | TicketProduct, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -35,21 +44,19 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product: Product, quantity: number = 1) => {
+  const addToCart = (product: Product | TicketProduct, quantity: number = 1) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product._id === product._id);
-      
-      if (existingItem) {
-        // Update quantity if item already exists
-        return prevItems.map(item =>
-          item.product._id === product._id
-            ? { ...item, quantity: Math.min(item.quantity + quantity, product.quantity) }
-            : item
-        );
-      } else {
-        // Add new item to cart
-        return [...prevItems, { product, quantity: Math.min(quantity, product.quantity) }];
+      const existingItemIndex = prevItems.findIndex(
+        item =>
+          item.product._id === product._id &&
+          item.product.category === product.category
+      );
+      if (existingItemIndex !== -1) {
+        const updated = [...prevItems];
+        updated[existingItemIndex].quantity = updated[existingItemIndex].quantity + (quantity || 1);
+        return updated;
       }
+      return [...prevItems, { product, quantity: quantity || 1 }];
     });
   };
 
@@ -58,15 +65,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-
     setCartItems(prevItems =>
       prevItems.map(item => {
         if (item.product._id === productId) {
-          return { ...item, quantity: Math.min(quantity, item.product.quantity) };
+          // For tickets, allow any positive quantity
+          if (item.product.category === 'ticket') {
+            return { ...item, quantity: Math.max(1, quantity) };
+          }
+          // For products, clamp to available stock
+          return { ...item, quantity: Math.max(1, Math.min(quantity, (item.product as Product).quantity)) };
         }
         return item;
       })
