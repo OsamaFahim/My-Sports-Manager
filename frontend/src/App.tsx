@@ -69,9 +69,7 @@ const App: React.FC = () => {
                         />                        <Route
                           path="/notifications"
                           element={
-                            <ProtectedRoute>
                               <NotificationsPage />
-                            </ProtectedRoute>
                           }
                         />                        <Route
                           path="/products"
