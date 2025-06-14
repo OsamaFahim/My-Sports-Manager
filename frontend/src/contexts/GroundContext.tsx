@@ -26,7 +26,7 @@ export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [grounds, setGrounds] = useState<Ground[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPublicView, setIsPublicView] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authLoading } = useAuth();
 
   const fetchGrounds = async () => {
     setLoading(true);
@@ -46,7 +46,7 @@ export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const data = await groundService.getAllGrounds();
       setGrounds(data);
-      setIsPublicView(true); // <-- THIS IS CRUCIAL
+      setIsPublicView(true); // <-- THIS IS CRUCIAL for loggedin out users
     } catch {
       setGrounds([]);
     } finally {
@@ -55,12 +55,13 @@ export const GroundProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   useEffect(() => {
+    if (authLoading) return; 
     if (isAuthenticated) {
       fetchGrounds();
     } else {
       fetchAllGrounds();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authLoading]);
 
   const addGround = async (ground: Omit<Ground, '_id'>) => {
     await groundService.createGround(ground);

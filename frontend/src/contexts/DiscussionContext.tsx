@@ -36,35 +36,41 @@ interface DiscussionContextType {
 const DiscussionContext = createContext<DiscussionContextType | undefined>(undefined);
 
 export const DiscussionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, username } = useAuth();
+  const { isAuthenticated, username, authLoading } = useAuth();
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isPublicView, setIsPublicView] = useState(false);
+
+ const fetchDiscussions = async () => {
+    setLoading(true);
+    try {
+      let discs: Discussion[] = [];
+      let comms: Comment[] = [];
+      if (isAuthenticated) {
+        discs = await discussionService.getDiscussions();
+        comms = await discussionService.getComments();
+        setIsPublicView(false);
+      } else {
+        discs = await discussionService.getDiscussions(); // fallback to public fetch if you don't have getAllDiscussions
+        comms = await discussionService.getComments();    // fallback to public fetch if you don't have getAllComments
+        setIsPublicView(true);
+      }
+      setDiscussions(discs);
+      setComments(comms);
+    } catch (error) {
+      setDiscussions([]);
+      setComments([]);
+      console.error('Failed to fetch discussions or comments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [discs, comms] = await Promise.all([
-          discussionService.getDiscussions(),
-          discussionService.getComments(),
-        ]);
-        if (mounted) {
-          setDiscussions(discs);
-          setComments(comms);
-        }
-      } catch (error) {
-        console.error('Failed to fetch discussions or comments:', error);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    fetchData();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    if (authLoading) return; 
+    fetchDiscussions();
+  }, [isAuthenticated, authLoading]);
 
   const addDiscussion = async (data: { title: string; content: string }) => {
     setLoading(true);

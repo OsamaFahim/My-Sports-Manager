@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -7,6 +6,7 @@ interface AuthContextType {
   userId: string | null;
   setAuthenticated: (auth: boolean, token?: string) => void;
   logout: () => void;
+  authLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,11 +14,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 function getUserDataFromToken(token: string | null): { username: string | null; userId: string | null } {
   if (!token) return { username: null, userId: null };
   try {
-    const decoded: { username?: string; userId?: string } = jwtDecode(token);
-    return { 
-      username: decoded.username || null,
-      userId: decoded.userId || null 
-    };
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return { username: payload.username, userId: payload.userId };
   } catch {
     return { username: null, userId: null };
   }
@@ -28,15 +25,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  // Sync token on first mount
   useEffect(() => {
     const token = sessionStorage.getItem('token');
     setIsAuthenticated(!!token);
     const userData = getUserDataFromToken(token);
     setUsername(userData.username);
     setUserId(userData.userId);
+    setAuthLoading(false);
   }, []);
+
   const setAuthenticated = (auth: boolean, token?: string) => {
     if (auth && token) {
       sessionStorage.setItem('token', token);
@@ -51,14 +50,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.removeItem('token');
     }
   };
+
   const logout = () => {
     setIsAuthenticated(false);
     setUsername(null);
     setUserId(null);
     sessionStorage.removeItem('token');
   };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, username, userId, setAuthenticated, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, userId, setAuthenticated, logout, authLoading }}>
       {children}
     </AuthContext.Provider>
   );

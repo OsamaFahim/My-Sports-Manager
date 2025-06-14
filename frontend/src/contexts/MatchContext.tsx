@@ -24,7 +24,7 @@ interface MatchContextType {
 const MatchContext = createContext<MatchContextType | undefined>(undefined);
 
 export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authLoading } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(false);
   const [isPublicView, setIsPublicView] = useState(false); 
@@ -34,16 +34,23 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoading(true);
     setError(null);
     try {
-      const data = await matchService.getMatches();
-      setMatches(Array.isArray(data) ? data : []);
-      setIsPublicView(false); 
+      let data;
+      if (isAuthenticated) {
+        data = await matchService.getMatches();
+        setIsPublicView(false);
+      } else {
+        data = await matchService.getAllMatches();
+        setIsPublicView(true);
+      }
+      setMatches(data);
     } catch (err: any) {
+      setError('Failed to load matches');
       setMatches([]);
-      setError(err?.response?.data?.message || 'Failed to fetch matches');
     } finally {
       setLoading(false);
     }
   };
+
 
   const fetchAllMatches = async () => {
     setLoading(true);
@@ -58,13 +65,11 @@ export const MatchProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchMatches();
-    } else {
-      fetchAllMatches();
-    }
-  }, [isAuthenticated]);
+    if (authLoading) return;
+    fetchMatches();
+  }, [isAuthenticated, authLoading]);
 
   // Accepts date and time, combines to datetime before sending to backend
   const addMatch = async (match: { teamA: string; teamB: string; ground: string; date: string; time: string }) => {
