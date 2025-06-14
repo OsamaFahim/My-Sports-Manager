@@ -1,32 +1,33 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import styles from './navbar.module.css';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import styles from './Navbar.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 import MobileDrawer from '../MobileDrawer/MobileDrawer';
 import HamburgerIcon from '../HamburgerIcon/HamburgerIcon';
 
 interface NavbarProps {
-  onAuthAction?: (action: 'login' | 'signup') => void;
+  onAuthAction?: (action: 'none' | 'login' | 'signup') => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, username, logout } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
+  const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
+  const closeDrawer = () => setIsDrawerOpen(false);
 
-  const closeDrawer = () => {
-    setIsDrawerOpen(false);
+  const handleLogout = () => {
+    logout();
+    onAuthAction?.('none');
+    navigate('/', { replace: true });
   };
 
   return (
     <>
       <nav className={styles.navbar}>
         <div className={styles.logo}>Sportify</div>
-
         <ul className={styles.navLinks}>
           <li>
             <Link to="/" className={pathname === '/' ? styles.active : undefined}>
@@ -34,67 +35,51 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
             </Link>
           </li>
           <li>
-            <Link
-              to="/teams"
-              className={pathname === '/teams' ? styles.active : undefined}
-            >
+            <Link to="/teams" className={pathname === '/teams' ? styles.active : undefined}>
               Teams
             </Link>
           </li>
           <li>
-            <Link
-              to="/matches"
-              className={pathname === '/matches' ? styles.active : undefined}
-            >
+            <Link to="/matches" className={pathname === '/matches' ? styles.active : undefined}>
               Matches
             </Link>
           </li>
           <li>
-            <Link
-              to="/grounds"
-              className={pathname === '/grounds' ? styles.active : undefined}
-            >
+            <Link to="/grounds" className={pathname === '/grounds' ? styles.active : undefined}>
               Grounds
-            </Link>
-          </li>        <li>
-            <Link
-              to="/Discussions"
-              className={pathname === '/Discussions' ? styles.active : undefined}
-            >
-              Discussions
-            </Link>
-          </li>        <li>
-            <Link
-              to="/products"
-              className={pathname === '/products' ? styles.active : undefined}
-            >
-              Products
-            </Link>
-          </li>        <li>
-            <Link
-              to="/shop"
-              className={pathname === '/shop' ? styles.active : undefined}
-            >
-              Shop
-            </Link>
-          </li>        <li>
-            <Link
-              to="/tracking"
-              className={pathname === '/tracking' ? styles.active : undefined}
-            >
-              Track Order
             </Link>
           </li>
           <li>
-            <Link
-              to="/financial-statistics"
-              className={pathname === '/financial-statistics' ? styles.active : undefined}
-            >
-              Financial Reports
+            <Link to="/discussions" className={pathname === '/discussions' ? styles.active : undefined}>
+              Discussions
             </Link>
           </li>
+          <li>
+            <Link to="/shop" className={pathname === '/shop' ? styles.active : undefined}>
+              Shop
+            </Link>
+          </li>
+          <li>
+            <Link to="/tracking" className={pathname === '/tracking' ? styles.active : undefined}>
+              Tracking
+            </Link>
+          </li>
+          {/* Only show these links if authenticated */}
+          {isAuthenticated && (
+            <>
+              <li>
+                <Link to="/products" className={pathname === '/products' ? styles.active : undefined}>
+                  Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/financial-statistics" className={pathname === '/financial-statistics' ? styles.active : undefined}>
+                  Financial Reports
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
-
         <div className={styles.navButtons}>
           {!isAuthenticated ? (
             <>
@@ -124,7 +109,7 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
               </span>
               <button
                 className={`${styles.authButton} ${styles.loginBtn}`}
-                onClick={logout}
+                onClick={handleLogout}
                 type="button"
               >
                 Logout
@@ -132,14 +117,10 @@ const Navbar: React.FC<NavbarProps> = ({ onAuthAction }) => {
             </div>
           )}
         </div>
-
-        {/* Mobile Hamburger Icon */}
         <div className={styles.mobileMenuButton}>
           <HamburgerIcon isOpen={isDrawerOpen} onClick={toggleDrawer} />
         </div>
       </nav>
-
-      {/* Mobile Drawer */}
       <MobileDrawer 
         isOpen={isDrawerOpen} 
         onClose={closeDrawer}
